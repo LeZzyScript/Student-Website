@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,26 +47,50 @@ interface Admin {
   name: string;
 }
 
-// Mock data
-const mockStudents: Student[] = [
-  { id: "1", studId: "2501425", yearLevel: 1, course: "BSIT", accUserId: "12345678" },
-  { id: "2", studId: "2502425", yearLevel: 2, course: "BSN", accUserId: "23456789" },
-  { id: "3", studId: "2503425", yearLevel: 3, course: "BSCRIM", accUserId: "34567890" },
-  { id: "4", studId: "2504425", yearLevel: 4, course: "BSHM", accUserId: "45678901" },
-];
-
-const mockAdmins: Admin[] = [
-  { id: "1", accUserId: "119904100228", name: "System Administrator" },
-];
-
 export function UserManagement() {
-  const [students, setStudents] = useState<Student[]>(mockStudents);
-  const [admins, setAdmins] = useState<Admin[]>(mockAdmins);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [admins, setAdmins] = useState<Admin[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ type: "student" | "admin"; id: string } | null>(null);
   const [showAddAdmin, setShowAddAdmin] = useState(false);
   const [newAdmin, setNewAdmin] = useState({ accUserId: "", name: "", password: "" });
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [studentsRes, adminsRes] = await Promise.all([
+          fetch("http://localhost:5256/api/students"),
+          fetch("http://localhost:5256/api/admins"),
+        ]);
+
+        if (studentsRes.ok) {
+          const sData = await studentsRes.json();
+          const mappedStudents: Student[] = sData.map((s: any) => ({
+            id: String(s.studId),
+            studId: s.studStudentId,
+            yearLevel: s.yearLevel,
+            course: s.course,
+            accUserId: s.accUserId,
+          }));
+          setStudents(mappedStudents);
+        }
+
+        if (adminsRes.ok) {
+          const aData = await adminsRes.json();
+          const mappedAdmins: Admin[] = aData.map((a: any) => ({
+            id: String(a.accIndex),
+            accUserId: a.accUserId,
+            name: a.name,
+          }));
+          setAdmins(mappedAdmins);
+        }
+      } catch {
+        // ignore, UI will just show empty lists
+      }
+    };
+    loadData();
+  }, []);
 
   const handleDeleteStudent = (id: string) => {
     setStudents(students.filter((s) => s.id !== id));
@@ -79,26 +103,46 @@ export function UserManagement() {
       toast({ title: "Cannot Delete", description: "At least one admin must exist.", variant: "destructive" });
       return;
     }
+    // In a real app, we'd call DELETE /api/admins/{accIndex}
     setAdmins(admins.filter((a) => a.id !== id));
     setDeleteTarget(null);
     toast({ title: "Admin Deleted", description: "The admin account has been removed." });
   };
 
-  const handleAddAdmin = (e: React.FormEvent) => {
+  const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAdmin.accUserId || !newAdmin.name || !newAdmin.password) {
       toast({ title: "Error", description: "All fields are required.", variant: "destructive" });
       return;
     }
-    const admin: Admin = {
-      id: Date.now().toString(),
-      accUserId: newAdmin.accUserId,
-      name: newAdmin.name,
-    };
-    setAdmins([...admins, admin]);
-    setNewAdmin({ accUserId: "", name: "", password: "" });
-    setShowAddAdmin(false);
-    toast({ title: "Admin Added", description: "New admin account created successfully." });
+    try {
+      const res = await fetch("http://localhost:5256/api/admins", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: newAdmin.accUserId,
+          name: newAdmin.name,
+          password: newAdmin.password,
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        toast({ title: "Error", description: text || "Failed to create admin.", variant: "destructive" });
+        return;
+      }
+      const data = await res.json();
+      const admin: Admin = {
+        id: String(data.accIndex),
+        accUserId: data.accUserId,
+        name: data.name ?? newAdmin.name,
+      };
+      setAdmins([...admins, admin]);
+      setNewAdmin({ accUserId: "", name: "", password: "" });
+      setShowAddAdmin(false);
+      toast({ title: "Admin Added", description: "New admin account created successfully." });
+    } catch {
+      toast({ title: "Error", description: "Unable to contact server.", variant: "destructive" });
+    }
   };
 
   return (

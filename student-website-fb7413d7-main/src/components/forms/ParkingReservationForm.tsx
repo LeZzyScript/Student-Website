@@ -45,7 +45,7 @@ export function ParkingReservationForm({ onClose, onSuccess }: ParkingReservatio
 
   const spots = generateSpots();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.spot || !formData.vehicleType || !formData.vehicleModel || !formData.schedule) {
@@ -57,19 +57,62 @@ export function ParkingReservationForm({ onClose, onSuccess }: ParkingReservatio
       return;
     }
 
-    // Simulate submission
-    console.log("Parking Reservation:", {
-      ...formData,
-      dateCreated: new Date().toISOString(),
-      isAvailable: false,
-    });
+    const stored = localStorage.getItem("registeredUser");
+    if (!stored) {
+      toast({
+        title: "Not registered",
+        description: "Please register first before reserving parking.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    toast({
-      title: "Success",
-      description: "Parking reservation submitted successfully!",
-    });
-    onSuccess?.();
-    onClose();
+    const parsed = JSON.parse(stored) as { studId?: string };
+    if (!parsed.studId) {
+      toast({
+        title: "Error",
+        description: "Student ID not found. Please register again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5256/api/parking/reserve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studStudentId: parsed.studId,
+          spot: formData.spot,
+          vehicleType: formData.vehicleType,
+          vehicleModel: formData.vehicleModel,
+          schedule: formData.schedule,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        toast({
+          title: "Error",
+          description: text || "Failed to reserve parking.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Parking reservation submitted successfully!",
+      });
+      onSuccess?.();
+      onClose();
+    } catch {
+      toast({
+        title: "Error",
+        description: "Unable to contact server. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

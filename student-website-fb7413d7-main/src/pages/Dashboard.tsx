@@ -136,16 +136,12 @@ const Dashboard = () => {
                     <span className="text-primary font-medium text-sm">JD</span>
                   </div>
                   <span className="hidden md:block text-sm font-medium text-foreground">
-                    Juan Dela Cruz
+                    Student Dashboard
                   </span>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem className="flex flex-col items-start">
-                  <span className="font-medium">Juan Dela Cruz</span>
-                  <span className="text-xs text-muted-foreground">2024-00001</span>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -161,7 +157,7 @@ const Dashboard = () => {
       <main className="container px-4 md:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-            Welcome back, Juan!
+            Welcome back!
           </h2>
           <p className="text-muted-foreground mt-1">
             Manage your campus reservations and requests

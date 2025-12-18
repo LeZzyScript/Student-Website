@@ -32,7 +32,7 @@ export function LockerReservationForm({ onClose }: { onClose: () => void }) {
 
   const spots = generateSpots();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.spot) {
@@ -44,18 +44,58 @@ export function LockerReservationForm({ onClose }: { onClose: () => void }) {
       return;
     }
 
-    // Simulate submission
-    console.log("Locker Reservation:", {
-      ...formData,
-      dateCreated: new Date().toISOString(),
-      isAvailable: false,
-    });
+    const stored = localStorage.getItem("registeredUser");
+    if (!stored) {
+      toast({
+        title: "Not registered",
+        description: "Please register first before reserving a locker.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    toast({
-      title: "Success",
-      description: "Locker reservation submitted successfully!",
-    });
-    onClose();
+    const parsed = JSON.parse(stored) as { studId?: string };
+    if (!parsed.studId) {
+      toast({
+        title: "Error",
+        description: "Student ID not found. Please register again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5256/api/lockers/reserve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studStudentId: parsed.studId,
+          spot: formData.spot,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        toast({
+          title: "Error",
+          description: text || "Failed to reserve locker.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Locker reservation submitted successfully!",
+      });
+      onClose();
+    } catch {
+      toast({
+        title: "Error",
+        description: "Unable to contact server. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

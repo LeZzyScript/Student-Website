@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -31,48 +31,32 @@ interface ActivityRequest {
   status: "pending" | "approved" | "declined";
 }
 
-const mockActivities: ActivityRequest[] = [
-  {
-    id: "1",
-    activityName: "Annual Sports Festival",
-    description: "A week-long sports competition featuring basketball, volleyball, and athletics.",
-    organizers: ["Sports Committee", "Student Council"],
-    submittedBy: "Juan Dela Cruz",
-    submittedDate: "2025-01-15",
-    status: "pending",
-  },
-  {
-    id: "2",
-    activityName: "Tech Talk 2025",
-    description: "A seminar on emerging technologies including AI, blockchain, and cybersecurity.",
-    organizers: ["Computer Science Club"],
-    submittedBy: "Maria Santos",
-    submittedDate: "2025-01-14",
-    status: "pending",
-  },
-  {
-    id: "3",
-    activityName: "Cultural Night",
-    description: "Celebration of Filipino culture through dance, music, and food.",
-    organizers: ["Arts and Culture Club"],
-    submittedBy: "Pedro Garcia",
-    submittedDate: "2025-01-10",
-    status: "approved",
-  },
-  {
-    id: "4",
-    activityName: "Debate Championship",
-    description: "Inter-college debate competition on current social issues.",
-    organizers: ["Debate Club"],
-    submittedBy: "Ana Reyes",
-    submittedDate: "2025-01-08",
-    status: "declined",
-  },
-];
-
 export function ActivityManagement() {
-  const [activities, setActivities] = useState<ActivityRequest[]>(mockActivities);
+  const [activities, setActivities] = useState<ActivityRequest[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<ActivityRequest | null>(null);
+
+  useEffect(() => {
+    const loadActivities = async () => {
+      try {
+        const res = await fetch("http://localhost:5256/api/activities");
+        if (!res.ok) return;
+        const data = await res.json();
+        const mapped: ActivityRequest[] = data.map((a: any) => ({
+          id: String(a.act_Id),
+          activityName: a.act_Name,
+          description: a.act_Description,
+          organizers: [a.organizer?.org_Organization ?? "Organizer"],
+          submittedBy: a.student ? `${a.student.stud_StudentId}` : "Unknown",
+          submittedDate: new Date().toISOString().slice(0, 10),
+          status: a.act_IsGranted ? "approved" : "pending",
+        }));
+        setActivities(mapped);
+      } catch {
+        // ignore
+      }
+    };
+    loadActivities();
+  }, []);
 
   const handleApprove = (id: string) => {
     setActivities(activities.map((a) => 

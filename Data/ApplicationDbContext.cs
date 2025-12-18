@@ -32,7 +32,7 @@ namespace StudentWebsite.Data
     modelBuilder.Entity<ActivityStatus>()
         .HasOne(a => a.Account)
         .WithMany()
-        .HasForeignKey(a => a.ACC_Index)   // <-- was ACC_UserId
+        .HasForeignKey(a => a.ACC_Index)   
         .OnDelete(DeleteBehavior.NoAction);
 
     // LockerStatus
@@ -45,7 +45,7 @@ namespace StudentWebsite.Data
     modelBuilder.Entity<LockerStatus>()
         .HasOne(l => l.Account)
         .WithMany()
-        .HasForeignKey(l => l.ACC_Index)   // <-- was ACC_UserId
+        .HasForeignKey(l => l.ACC_Index)   
         .OnDelete(DeleteBehavior.NoAction);
 
     // ParkingStatus
@@ -58,7 +58,7 @@ namespace StudentWebsite.Data
     modelBuilder.Entity<ParkingStatus>()
         .HasOne(p => p.Account)
         .WithMany()
-        .HasForeignKey(p => p.ACC_Index)   // <-- was ACC_UserId
+        .HasForeignKey(p => p.ACC_Index)   
         .OnDelete(DeleteBehavior.NoAction);
 }
     }

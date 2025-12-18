@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,19 +39,8 @@ interface Organizer {
   organization: string;
 }
 
-const mockOrganizers: Organizer[] = [
-  { id: 1, firstName: "Juan", middleInitial: "D", lastName: "Cruz", organization: "Student Council" },
-  { id: 2, firstName: "Maria", middleInitial: "S", lastName: "Santos", organization: "Computer Science Club" },
-  { id: 3, firstName: "Pedro", middleInitial: "G", lastName: "Garcia", organization: "Sports Committee" },
-  { id: 4, firstName: "Ana", middleInitial: "R", lastName: "Reyes", organization: "Arts and Culture Club" },
-  { id: 5, firstName: "Jose", middleInitial: "P", lastName: "Rizal", organization: "Environmental Society" },
-  { id: 6, firstName: "Andres", middleInitial: "B", lastName: "Bonifacio", organization: "Debate Club" },
-  { id: 7, firstName: "Gabriela", middleInitial: "S", lastName: "Silang", organization: "Music Club" },
-  { id: 8, firstName: "Emilio", middleInitial: "A", lastName: "Aguinaldo", organization: "Photography Club" },
-];
-
 export function OrganizerManagement() {
-  const [organizers, setOrganizers] = useState<Organizer[]>(mockOrganizers);
+  const [organizers, setOrganizers] = useState<Organizer[]>([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editOrganizer, setEditOrganizer] = useState<Organizer | null>(null);
   const [deleteOrganizer, setDeleteOrganizer] = useState<Organizer | null>(null);
@@ -62,59 +51,137 @@ export function OrganizerManagement() {
     organization: "",
   });
 
+  useEffect(() => {
+    const loadOrganizers = async () => {
+      try {
+        const res = await fetch("http://localhost:5256/api/organizers");
+        if (!res.ok) return;
+        const data = await res.json();
+        const mapped: Organizer[] = data.map((o: any) => ({
+          id: o.org_Id,
+          firstName: o.org_FName,
+          middleInitial: o.org_MiddleI ?? "",
+          lastName: o.org_LName,
+          organization: o.org_Organization,
+        }));
+        setOrganizers(mapped);
+      } catch {
+        // ignore
+      }
+    };
+    loadOrganizers();
+  }, []);
+
   const resetForm = () => {
     setFormData({ firstName: "", middleInitial: "", lastName: "", organization: "" });
   };
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.firstName || !formData.lastName || !formData.organization) {
       toast({ title: "Error", description: "Please fill in required fields.", variant: "destructive" });
       return;
     }
 
-    const newId = Math.max(...organizers.map((o) => o.id), 0) + 1;
-    const newOrganizer: Organizer = {
-      id: newId,
-      ...formData,
-    };
-
-    setOrganizers([...organizers, newOrganizer]);
-    resetForm();
-    setShowAddDialog(false);
-    toast({
-      title: "Organizer Added",
-      description: `${formData.firstName} ${formData.lastName} has been added. Activity forms will be updated.`,
-    });
+    try {
+      const res = await fetch("http://localhost:5256/api/organizers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          middleInitial: formData.middleInitial,
+          lastName: formData.lastName,
+          organization: formData.organization,
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        toast({ title: "Error", description: text || "Failed to add organizer.", variant: "destructive" });
+        return;
+      }
+      const data = await res.json();
+      const newOrganizer: Organizer = {
+        id: data.org_Id,
+        firstName: data.org_FName,
+        middleInitial: data.org_MiddleI ?? "",
+        lastName: data.org_LName,
+        organization: data.org_Organization,
+      };
+      setOrganizers([...organizers, newOrganizer]);
+      resetForm();
+      setShowAddDialog(false);
+      toast({
+        title: "Organizer Added",
+        description: `${newOrganizer.firstName} ${newOrganizer.lastName} has been added. Activity forms will be updated.`,
+      });
+    } catch {
+      toast({ title: "Error", description: "Unable to contact server.", variant: "destructive" });
+    }
   };
 
-  const handleEdit = (e: React.FormEvent) => {
+  const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editOrganizer || !formData.firstName || !formData.lastName || !formData.organization) {
       toast({ title: "Error", description: "Please fill in required fields.", variant: "destructive" });
       return;
     }
 
-    setOrganizers(organizers.map((o) => 
-      o.id === editOrganizer.id ? { ...o, ...formData } : o
-    ));
-    resetForm();
-    setEditOrganizer(null);
-    toast({
-      title: "Organizer Updated",
-      description: "The organizer has been updated. Activity forms will reflect this change.",
-    });
+    try {
+      const res = await fetch(`http://localhost:5256/api/organizers/${editOrganizer.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          middleInitial: formData.middleInitial,
+          lastName: formData.lastName,
+          organization: formData.organization,
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        toast({ title: "Error", description: text || "Failed to update organizer.", variant: "destructive" });
+        return;
+      }
+      const data = await res.json();
+      const updated: Organizer = {
+        id: data.org_Id,
+        firstName: data.org_FName,
+        middleInitial: data.org_MiddleI ?? "",
+        lastName: data.org_LName,
+        organization: data.org_Organization,
+      };
+      setOrganizers(organizers.map((o) => (o.id === updated.id ? updated : o)));
+      resetForm();
+      setEditOrganizer(null);
+      toast({
+        title: "Organizer Updated",
+        description: "The organizer has been updated. Activity forms will reflect this change.",
+      });
+    } catch {
+      toast({ title: "Error", description: "Unable to contact server.", variant: "destructive" });
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteOrganizer) return;
-    
-    setOrganizers(organizers.filter((o) => o.id !== deleteOrganizer.id));
-    toast({
-      title: "Organizer Removed",
-      description: `${deleteOrganizer.firstName} ${deleteOrganizer.lastName} has been removed. Activity forms will be updated.`,
-    });
-    setDeleteOrganizer(null);
+    try {
+      const res = await fetch(`http://localhost:5256/api/organizers/${deleteOrganizer.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        toast({ title: "Error", description: text || "Failed to delete organizer.", variant: "destructive" });
+        return;
+      }
+      setOrganizers(organizers.filter((o) => o.id !== deleteOrganizer.id));
+      toast({
+        title: "Organizer Removed",
+        description: `${deleteOrganizer.firstName} ${deleteOrganizer.lastName} has been removed. Activity forms will be updated.`,
+      });
+      setDeleteOrganizer(null);
+    } catch {
+      toast({ title: "Error", description: "Unable to contact server.", variant: "destructive" });
+    }
   };
 
   const openEditDialog = (organizer: Organizer) => {

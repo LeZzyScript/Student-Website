@@ -20,15 +20,6 @@ interface RegisterFormProps {
 const courses = ["BSIT", "BSN", "BSCRIM", "BSHM", "BSMT"];
 const yearLevels = ["1", "2", "3", "4"];
 
-const generateStudentId = () => {
-  const year = new Date().getFullYear();
-  const yearPrefix = year.toString().slice(2);
-  const yearSuffix = year.toString().slice(2);
-  const randomNum = Math.floor(Math.random() * 900) + 1;
-  const paddedNum = randomNum.toString().padStart(3, "0");
-  return `${yearPrefix}${paddedNum}${yearSuffix}`;
-};
-
 export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -41,7 +32,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
   const [registrationComplete, setRegistrationComplete] = useState(false);
   const [generatedStudentId, setGeneratedStudentId] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!userId.trim() || !password.trim() || !confirmPassword.trim() || !yearLevel || !course) {
@@ -61,27 +52,48 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
 
     setIsLoading(true);
 
-    // Simulate registration
-    setTimeout(() => {
-      const studentId = generateStudentId();
-      
-      // Store simulated user data
+    try {
+      const response = await fetch("http://localhost:5256/api/accounts/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          password,
+          yearLevel: Number(yearLevel),
+          course,
+        }),
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        toast.error(message || "Registration failed");
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+
       const userData = {
-        accIndex: Date.now(),
-        accUserId: userId,
-        accRole: "student",
-        studId: studentId,
-        studYearLevel: yearLevel,
-        studCourse: course,
+        accIndex: data.accIndex,
+        accUserId: data.accUserId,
+        accRole: data.accRole,
+        studId: data.studStudentId,
+        studYearLevel: data.studYearLevel,
+        studCourse: data.studCourse,
       };
-      
+
       localStorage.setItem("registeredUser", JSON.stringify(userData));
-      
-      setGeneratedStudentId(studentId);
+
+      setGeneratedStudentId(data.studStudentId);
       setRegistrationComplete(true);
       setIsLoading(false);
       onSuccess?.();
-    }, 1500);
+    } catch {
+      toast.error("Unable to register. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
