@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudentWebsite.Models
@@ -11,10 +12,12 @@ namespace StudentWebsite.Models
         [Required]
         public int STUD_Id { get; set; }
 
-        [ForeignKey("STUD_Id")]
+        [ForeignKey(nameof(STUD_Id))]
         public Student Student { get; set; }
 
-        [Required, MaxLength(2)]
+        // A1, B5, etc.
+        [Required]
+        [MaxLength(2)]
         public string LOCK_Spot { get; set; }
 
         [Required]

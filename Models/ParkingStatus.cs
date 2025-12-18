@@ -10,19 +10,22 @@ namespace StudentWebsite.Models
 
         [Required]
         public int PARK_Id { get; set; }
-        [ForeignKey("PARK_Id")]
+
+        [ForeignKey(nameof(PARK_Id))]
         public Parking Parking { get; set; }
 
+        // Admin account who performed the action
         [Required]
-        public int ADMIN_Id { get; set; }
-        [ForeignKey("ADMIN_Id")]
-        public Admin Admin { get; set; }
-        
+        public int ACC_Index { get; set; }
+
+        [ForeignKey(nameof(ACC_Index))]
+        public Account Account { get; set; }
+
         [Required]
         public bool PARK_IsAvailable { get; set; }
 
-        [Required, MaxLength(100)]
+        [Required]
+        [MaxLength(100)]
         public string PARK_Notify { get; set; }
-
     }
 }

@@ -10,19 +10,22 @@ namespace StudentWebsite.Models
 
         [Required]
         public int LOCK_Id { get; set; }
-        [ForeignKey("LOCK_Id")]
+
+        [ForeignKey(nameof(LOCK_Id))]
         public Locker Locker { get; set; }
 
+        // Admin account who performed the action
         [Required]
-        public int ADMIN_Id { get; set; }
+        public int ACC_Index { get; set; }
 
-        [ForeignKey("ADMIN_Id")]
-        public Admin Admin { get; set; }
+        [ForeignKey(nameof(ACC_Index))]
+        public Account Account { get; set; }
 
         [Required]
         public bool LOCK_IsGranted { get; set; }
 
-        [Required, MaxLength(100)]
+        [Required]
+        [MaxLength(100)]
         public string LOCK_Notify { get; set; }
     }
 }

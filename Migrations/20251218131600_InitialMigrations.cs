@@ -6,24 +6,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StudentWebsite.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Admins",
+                name: "Accounts",
                 columns: table => new
                 {
-                    ADMIN_Id = table.Column<int>(type: "int", nullable: false)
+                    ACC_Index = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
-                    MiddleI = table.Column<string>(type: "nvarchar(1)", maxLength: 1, nullable: true),
-                    LName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false)
+                    ACC_UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ACC_Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ACC_Role = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Admins", x => x.ADMIN_Id);
+                    table.PrimaryKey("PK_Accounts", x => x.ACC_Index);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,15 +48,20 @@ namespace StudentWebsite.Migrations
                 {
                     STUD_Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    STUD_FName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
-                    STUD_MiddleI = table.Column<string>(type: "nvarchar(1)", maxLength: 1, nullable: true),
-                    STUD_LName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
+                    STUD_StudentId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     STUD_YearLevel = table.Column<int>(type: "int", nullable: false),
-                    STUD_Course = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false)
+                    STUD_Course = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
+                    ACC_Index = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Students", x => x.STUD_Id);
+                    table.ForeignKey(
+                        name: "FK_Students_Accounts_ACC_Index",
+                        column: x => x.ACC_Index,
+                        principalTable: "Accounts",
+                        principalColumn: "ACC_Index",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -142,7 +147,7 @@ namespace StudentWebsite.Migrations
                     ACT_StatusId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ACT_Id = table.Column<int>(type: "int", nullable: false),
-                    ADMIN_Id = table.Column<int>(type: "int", nullable: false),
+                    ACC_Index = table.Column<int>(type: "int", nullable: false),
                     ACT_IsGranted = table.Column<bool>(type: "bit", nullable: false),
                     ACT_Notify = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
@@ -150,17 +155,15 @@ namespace StudentWebsite.Migrations
                 {
                     table.PrimaryKey("PK_ActivityStatuses", x => x.ACT_StatusId);
                     table.ForeignKey(
+                        name: "FK_ActivityStatuses_Accounts_ACC_Index",
+                        column: x => x.ACC_Index,
+                        principalTable: "Accounts",
+                        principalColumn: "ACC_Index");
+                    table.ForeignKey(
                         name: "FK_ActivityStatuses_Activities_ACT_Id",
                         column: x => x.ACT_Id,
                         principalTable: "Activities",
-                        principalColumn: "ACT_Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ActivityStatuses_Admins_ADMIN_Id",
-                        column: x => x.ADMIN_Id,
-                        principalTable: "Admins",
-                        principalColumn: "ADMIN_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ACT_Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -170,7 +173,7 @@ namespace StudentWebsite.Migrations
                     LOCK_StatusId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LOCK_Id = table.Column<int>(type: "int", nullable: false),
-                    ADMIN_Id = table.Column<int>(type: "int", nullable: false),
+                    ACC_Index = table.Column<int>(type: "int", nullable: false),
                     LOCK_IsGranted = table.Column<bool>(type: "bit", nullable: false),
                     LOCK_Notify = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
@@ -178,17 +181,15 @@ namespace StudentWebsite.Migrations
                 {
                     table.PrimaryKey("PK_LockerStatuses", x => x.LOCK_StatusId);
                     table.ForeignKey(
-                        name: "FK_LockerStatuses_Admins_ADMIN_Id",
-                        column: x => x.ADMIN_Id,
-                        principalTable: "Admins",
-                        principalColumn: "ADMIN_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_LockerStatuses_Accounts_ACC_Index",
+                        column: x => x.ACC_Index,
+                        principalTable: "Accounts",
+                        principalColumn: "ACC_Index");
                     table.ForeignKey(
                         name: "FK_LockerStatuses_Lockers_LOCK_Id",
                         column: x => x.LOCK_Id,
                         principalTable: "Lockers",
-                        principalColumn: "LOCK_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "LOCK_Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -198,7 +199,7 @@ namespace StudentWebsite.Migrations
                     PARK_StatusId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PARK_Id = table.Column<int>(type: "int", nullable: false),
-                    ADMIN_Id = table.Column<int>(type: "int", nullable: false),
+                    ACC_Index = table.Column<int>(type: "int", nullable: false),
                     PARK_IsAvailable = table.Column<bool>(type: "bit", nullable: false),
                     PARK_Notify = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
@@ -206,17 +207,15 @@ namespace StudentWebsite.Migrations
                 {
                     table.PrimaryKey("PK_ParkingStatuses", x => x.PARK_StatusId);
                     table.ForeignKey(
-                        name: "FK_ParkingStatuses_Admins_ADMIN_Id",
-                        column: x => x.ADMIN_Id,
-                        principalTable: "Admins",
-                        principalColumn: "ADMIN_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_ParkingStatuses_Accounts_ACC_Index",
+                        column: x => x.ACC_Index,
+                        principalTable: "Accounts",
+                        principalColumn: "ACC_Index");
                     table.ForeignKey(
                         name: "FK_ParkingStatuses_Parkings_PARK_Id",
                         column: x => x.PARK_Id,
                         principalTable: "Parkings",
-                        principalColumn: "PARK_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "PARK_Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -230,14 +229,14 @@ namespace StudentWebsite.Migrations
                 column: "STUD_Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ActivityStatuses_ACC_Index",
+                table: "ActivityStatuses",
+                column: "ACC_Index");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ActivityStatuses_ACT_Id",
                 table: "ActivityStatuses",
                 column: "ACT_Id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ActivityStatuses_ADMIN_Id",
-                table: "ActivityStatuses",
-                column: "ADMIN_Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lockers_STUD_Id",
@@ -245,9 +244,9 @@ namespace StudentWebsite.Migrations
                 column: "STUD_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LockerStatuses_ADMIN_Id",
+                name: "IX_LockerStatuses_ACC_Index",
                 table: "LockerStatuses",
-                column: "ADMIN_Id");
+                column: "ACC_Index");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LockerStatuses_LOCK_Id",
@@ -260,14 +259,19 @@ namespace StudentWebsite.Migrations
                 column: "STUD_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ParkingStatuses_ADMIN_Id",
+                name: "IX_ParkingStatuses_ACC_Index",
                 table: "ParkingStatuses",
-                column: "ADMIN_Id");
+                column: "ACC_Index");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ParkingStatuses_PARK_Id",
                 table: "ParkingStatuses",
                 column: "PARK_Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_ACC_Index",
+                table: "Students",
+                column: "ACC_Index");
         }
 
         /// <inheritdoc />
@@ -289,9 +293,6 @@ namespace StudentWebsite.Migrations
                 name: "Lockers");
 
             migrationBuilder.DropTable(
-                name: "Admins");
-
-            migrationBuilder.DropTable(
                 name: "Parkings");
 
             migrationBuilder.DropTable(
@@ -299,6 +300,9 @@ namespace StudentWebsite.Migrations
 
             migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "Accounts");
         }
     }
 }

@@ -1,0 +1,263 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CalendarPlus, Check, X, Eye, Clock, CheckCircle, XCircle } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+
+interface ActivityRequest {
+  id: string;
+  activityName: string;
+  description: string;
+  organizers: string[];
+  submittedBy: string;
+  submittedDate: string;
+  status: "pending" | "approved" | "declined";
+}
+
+const mockActivities: ActivityRequest[] = [
+  {
+    id: "1",
+    activityName: "Annual Sports Festival",
+    description: "A week-long sports competition featuring basketball, volleyball, and athletics.",
+    organizers: ["Sports Committee", "Student Council"],
+    submittedBy: "Juan Dela Cruz",
+    submittedDate: "2025-01-15",
+    status: "pending",
+  },
+  {
+    id: "2",
+    activityName: "Tech Talk 2025",
+    description: "A seminar on emerging technologies including AI, blockchain, and cybersecurity.",
+    organizers: ["Computer Science Club"],
+    submittedBy: "Maria Santos",
+    submittedDate: "2025-01-14",
+    status: "pending",
+  },
+  {
+    id: "3",
+    activityName: "Cultural Night",
+    description: "Celebration of Filipino culture through dance, music, and food.",
+    organizers: ["Arts and Culture Club"],
+    submittedBy: "Pedro Garcia",
+    submittedDate: "2025-01-10",
+    status: "approved",
+  },
+  {
+    id: "4",
+    activityName: "Debate Championship",
+    description: "Inter-college debate competition on current social issues.",
+    organizers: ["Debate Club"],
+    submittedBy: "Ana Reyes",
+    submittedDate: "2025-01-08",
+    status: "declined",
+  },
+];
+
+export function ActivityManagement() {
+  const [activities, setActivities] = useState<ActivityRequest[]>(mockActivities);
+  const [selectedActivity, setSelectedActivity] = useState<ActivityRequest | null>(null);
+
+  const handleApprove = (id: string) => {
+    setActivities(activities.map((a) => 
+      a.id === id ? { ...a, status: "approved" as const } : a
+    ));
+    toast({
+      title: "Activity Approved",
+      description: "The activity has been approved. The student will be notified.",
+    });
+    setSelectedActivity(null);
+  };
+
+  const handleDecline = (id: string) => {
+    setActivities(activities.map((a) => 
+      a.id === id ? { ...a, status: "declined" as const } : a
+    ));
+    toast({
+      title: "Activity Declined",
+      description: "The activity has been declined. The student will be notified.",
+      variant: "destructive",
+    });
+    setSelectedActivity(null);
+  };
+
+  const pendingActivities = activities.filter((a) => a.status === "pending");
+  const reviewedActivities = activities.filter((a) => a.status !== "pending");
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Badge variant="secondary" className="flex items-center gap-1"><Clock className="h-3 w-3" />Pending</Badge>;
+      case "approved":
+        return <Badge className="bg-green-500 flex items-center gap-1"><CheckCircle className="h-3 w-3" />Approved</Badge>;
+      case "declined":
+        return <Badge variant="destructive" className="flex items-center gap-1"><XCircle className="h-3 w-3" />Declined</Badge>;
+      default:
+        return null;
+    }
+  };
+
+  const ActivityTable = ({ items, showActions }: { items: ActivityRequest[]; showActions?: boolean }) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Activity Name</TableHead>
+          <TableHead>Organizers</TableHead>
+          <TableHead>Submitted By</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {items.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+              No activities found
+            </TableCell>
+          </TableRow>
+        ) : (
+          items.map((activity) => (
+            <TableRow key={activity.id}>
+              <TableCell className="font-medium">{activity.activityName}</TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-1">
+                  {activity.organizers.map((org) => (
+                    <Badge key={org} variant="outline" className="text-xs">{org}</Badge>
+                  ))}
+                </div>
+              </TableCell>
+              <TableCell>{activity.submittedBy}</TableCell>
+              <TableCell>{activity.submittedDate}</TableCell>
+              <TableCell>{getStatusBadge(activity.status)}</TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-2">
+                  <Button size="sm" variant="ghost" onClick={() => setSelectedActivity(activity)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  {showActions && (
+                    <>
+                      <Button size="sm" variant="ghost" className="text-green-600" onClick={() => handleApprove(activity.id)}>
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleDecline(activity.id)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
+  );
+
+  return (
+    <div className="space-y-6">
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="pending" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Pending ({pendingActivities.length})
+          </TabsTrigger>
+          <TabsTrigger value="reviewed" className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4" />
+            Reviewed ({reviewedActivities.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pending" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarPlus className="h-5 w-5" />
+                Pending Activity Requests
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ActivityTable items={pendingActivities} showActions />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reviewed" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarPlus className="h-5 w-5" />
+                Reviewed Activities
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ActivityTable items={reviewedActivities} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Activity Details Dialog */}
+      <Dialog open={!!selectedActivity} onOpenChange={() => setSelectedActivity(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedActivity?.activityName}
+              {selectedActivity && getStatusBadge(selectedActivity.status)}
+            </DialogTitle>
+            <DialogDescription>
+              Submitted by {selectedActivity?.submittedBy} on {selectedActivity?.submittedDate}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedActivity && (
+            <div className="space-y-4 py-4">
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-2">Description</h4>
+                <p className="text-sm">{selectedActivity.description}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-2">Organizers</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedActivity.organizers.map((org) => (
+                    <Badge key={org} variant="secondary">{org}</Badge>
+                  ))}
+                </div>
+              </div>
+
+              {selectedActivity.status === "pending" && (
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button onClick={() => handleApprove(selectedActivity.id)} className="flex-1 bg-green-600 hover:bg-green-700">
+                    <Check className="h-4 w-4 mr-2" />
+                    Approve
+                  </Button>
+                  <Button variant="destructive" onClick={() => handleDecline(selectedActivity.id)} className="flex-1">
+                    <X className="h-4 w-4 mr-2" />
+                    Decline
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

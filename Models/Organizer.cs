@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudentWebsite.Models
 {
@@ -7,15 +6,20 @@ namespace StudentWebsite.Models
     {
         [Key]
         public int ORG_Id { get; set; }
-        [Required,MaxLength(25)]
+
+        [Required]
+        [MaxLength(25)]
         public string ORG_FName { get; set; }
+
         [MaxLength(1)]
         public string? ORG_MiddleI { get; set; }
 
-        [Required, MaxLength(25)]
+        [Required]
+        [MaxLength(25)]
         public string ORG_LName { get; set; }
-        [Required, MaxLength(50)]
-        public string ORG_Organization { get; set; }
 
+        [Required]
+        [MaxLength(50)]
+        public string ORG_Organization { get; set; }
     }
 }

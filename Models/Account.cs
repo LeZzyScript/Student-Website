@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudentWebsite.Models
 {
@@ -8,17 +7,18 @@ namespace StudentWebsite.Models
         [Key]
         public int ACC_Index { get; set; }
 
+        // Frontend "userId"
         [Required]
-        public int ACC_UserId { get; set; }
+        [MaxLength(50)]
+        public string ACC_UserId { get; set; }
 
         [Required]
+        [MaxLength(100)]
         public string ACC_Password { get; set; }
 
-        //Check if admin
-        public int? ADMIN_Id { get; set; }
-
-        [ForeignKey("ADMIN_Id")]
-        public Admin Admin { get; set; }
-
+        // "student" or "admin"
+        [Required]
+        [MaxLength(20)]
+        public string ACC_Role { get; set; }
     }
 }

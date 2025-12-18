@@ -12,8 +12,8 @@ using StudentWebsite.Data;
 namespace StudentWebsite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251203102145_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20251218131600_InitialMigrations")]
+    partial class InitialMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,34 @@ namespace StudentWebsite.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("StudentWebsite.Models.Account", b =>
+                {
+                    b.Property<int>("ACC_Index")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ACC_Index"));
+
+                    b.Property<string>("ACC_Password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ACC_Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ACC_UserId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("ACC_Index");
+
+                    b.ToTable("Accounts");
+                });
 
             modelBuilder.Entity("StudentWebsite.Models.Activity", b =>
                 {
@@ -69,6 +97,9 @@ namespace StudentWebsite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ACT_StatusId"));
 
+                    b.Property<int>("ACC_Index")
+                        .HasColumnType("int");
+
                     b.Property<int>("ACT_Id")
                         .HasColumnType("int");
 
@@ -80,43 +111,13 @@ namespace StudentWebsite.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("ADMIN_Id")
-                        .HasColumnType("int");
-
                     b.HasKey("ACT_StatusId");
+
+                    b.HasIndex("ACC_Index");
 
                     b.HasIndex("ACT_Id");
 
-                    b.HasIndex("ADMIN_Id");
-
                     b.ToTable("ActivityStatuses");
-                });
-
-            modelBuilder.Entity("StudentWebsite.Models.Admin", b =>
-                {
-                    b.Property<int>("ADMIN_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ADMIN_Id"));
-
-                    b.Property<string>("FName")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.Property<string>("LName")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.Property<string>("MiddleI")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.HasKey("ADMIN_Id");
-
-                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("StudentWebsite.Models.Locker", b =>
@@ -156,7 +157,7 @@ namespace StudentWebsite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LOCK_StatusId"));
 
-                    b.Property<int>("ADMIN_Id")
+                    b.Property<int>("ACC_Index")
                         .HasColumnType("int");
 
                     b.Property<int>("LOCK_Id")
@@ -172,7 +173,7 @@ namespace StudentWebsite.Migrations
 
                     b.HasKey("LOCK_StatusId");
 
-                    b.HasIndex("ADMIN_Id");
+                    b.HasIndex("ACC_Index");
 
                     b.HasIndex("LOCK_Id");
 
@@ -263,7 +264,7 @@ namespace StudentWebsite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PARK_StatusId"));
 
-                    b.Property<int>("ADMIN_Id")
+                    b.Property<int>("ACC_Index")
                         .HasColumnType("int");
 
                     b.Property<int>("PARK_Id")
@@ -279,7 +280,7 @@ namespace StudentWebsite.Migrations
 
                     b.HasKey("PARK_StatusId");
 
-                    b.HasIndex("ADMIN_Id");
+                    b.HasIndex("ACC_Index");
 
                     b.HasIndex("PARK_Id");
 
@@ -294,29 +295,25 @@ namespace StudentWebsite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("STUD_Id"));
 
+                    b.Property<int>("ACC_Index")
+                        .HasColumnType("int");
+
                     b.Property<string>("STUD_Course")
                         .IsRequired()
                         .HasMaxLength(4)
                         .HasColumnType("nvarchar(4)");
 
-                    b.Property<string>("STUD_FName")
+                    b.Property<string>("STUD_StudentId")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.Property<string>("STUD_LName")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.Property<string>("STUD_MiddleI")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("STUD_YearLevel")
                         .HasColumnType("int");
 
                     b.HasKey("STUD_Id");
+
+                    b.HasIndex("ACC_Index");
 
                     b.ToTable("Students");
                 });
@@ -342,21 +339,21 @@ namespace StudentWebsite.Migrations
 
             modelBuilder.Entity("StudentWebsite.Models.ActivityStatus", b =>
                 {
+                    b.HasOne("StudentWebsite.Models.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("ACC_Index")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("StudentWebsite.Models.Activity", "Activity")
                         .WithMany()
                         .HasForeignKey("ACT_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("StudentWebsite.Models.Admin", "Admin")
-                        .WithMany()
-                        .HasForeignKey("ADMIN_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Account");
 
                     b.Navigation("Activity");
-
-                    b.Navigation("Admin");
                 });
 
             modelBuilder.Entity("StudentWebsite.Models.Locker", b =>
@@ -372,19 +369,19 @@ namespace StudentWebsite.Migrations
 
             modelBuilder.Entity("StudentWebsite.Models.LockerStatus", b =>
                 {
-                    b.HasOne("StudentWebsite.Models.Admin", "Admin")
+                    b.HasOne("StudentWebsite.Models.Account", "Account")
                         .WithMany()
-                        .HasForeignKey("ADMIN_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("ACC_Index")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("StudentWebsite.Models.Locker", "Locker")
                         .WithMany()
                         .HasForeignKey("LOCK_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Admin");
+                    b.Navigation("Account");
 
                     b.Navigation("Locker");
                 });
@@ -402,21 +399,32 @@ namespace StudentWebsite.Migrations
 
             modelBuilder.Entity("StudentWebsite.Models.ParkingStatus", b =>
                 {
-                    b.HasOne("StudentWebsite.Models.Admin", "Admin")
+                    b.HasOne("StudentWebsite.Models.Account", "Account")
                         .WithMany()
-                        .HasForeignKey("ADMIN_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("ACC_Index")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("StudentWebsite.Models.Parking", "Parking")
                         .WithMany()
                         .HasForeignKey("PARK_Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Parking");
+                });
+
+            modelBuilder.Entity("StudentWebsite.Models.Student", b =>
+                {
+                    b.HasOne("StudentWebsite.Models.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("ACC_Index")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Admin");
-
-                    b.Navigation("Parking");
+                    b.Navigation("Account");
                 });
 #pragma warning restore 612, 618
         }
