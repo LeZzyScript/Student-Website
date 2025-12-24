@@ -72,22 +72,23 @@ const fetchParkingSpots = async () => {
       throw new Error('Failed to fetch parking spots');
     }    
     if (Array.isArray(data)) {
-      // Map the data to include the new date fields
-      const mappedData = data.map((spot: any) => ({
-        id: spot.park_Spot,
-        occupied: !spot.park_IsAvailable,
-        student: spot.student ? {
-          studId: spot.student.stud_StudentId,
-          name: `${spot.student.stud_FirstName} ${spot.student.stud_LastName}`,
-          course: spot.student.stud_Course
-        } : undefined,
+      // Map the API response to match our ParkingSpot interface
+      const mappedSpots = data.map((spot: any) => ({
+        id: spot.pARK_Spot,
+        spotNumber: spot.pARK_Spot,
+        occupied: !!spot.student,
+        studentId: spot.student?.sTUD_StudentId,
+        studentName: spot.student ? 
+          `${spot.student.sTUD_FirstName} ${spot.student.sTUD_LastName}`.trim() : 
+          undefined,
+        studentCourse: spot.student?.stud_Course,
         vehicleType: spot.park_VehicleType,
         vehicleModel: spot.park_VehicleModel,
         schedule: spot.park_Schedule,
         reservationDate: spot.park_ReservationDate,
         expiryDate: spot.park_ExpiryDate
       }));
-      setSpots(mappedData);
+      setSpots(mappedSpots);
     } else {
       // If no data, initialize with empty grid
       setSpots(generateEmptyParkingGrid());
@@ -264,7 +265,7 @@ const fetchParkingSpots = async () => {
                   <span className="w-6 font-semibold text-muted-foreground">{row}</span>
                   <div className="flex gap-2 flex-wrap">
                     {spots
-                      .filter((spot) => spot.id.startsWith(row))
+                      .filter((spot) => spot.id?.startsWith(row))
                       .map((spot) => (
                         <button
                           key={spot.id}

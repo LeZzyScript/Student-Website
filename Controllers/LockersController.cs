@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentWebsite.Data;
 using StudentWebsite.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace StudentWebsite.Controllers
 {
@@ -25,6 +26,32 @@ namespace StudentWebsite.Controllers
             public string StudStudentId { get; set; }
             // Locker spot like "A1"
             public string Spot { get; set; }
+        }
+
+        [HttpGet]
+        [EnableCors("AllowFrontend")] 
+        public async Task<ActionResult<IEnumerable<object>>> GetLockers()
+        {
+            Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:8080");
+            Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+        return await _context.Lockers
+            .Include(l => l.Student)
+            .Select(l => new 
+            {
+            id = l.LOCK_Id,
+            spotNumber = l.LOCK_Spot,
+            isAvailable = l.LOCK_IsAvailable,
+            student = l.Student != null ? new 
+            {
+                id = l.Student.STUD_Id,
+                studentId = l.Student.STUD_StudentId,
+                name = $"{l.Student.STUD_FName} {l.Student.STUD_LName}",
+                course = l.Student.STUD_Course,
+                yearLevel = l.Student.STUD_YearLevel
+            } : null,
+            dateCreated = l.LOCK_DateCreated
+            })
+            .ToListAsync();
         }
 
         [HttpPost("reserve")]

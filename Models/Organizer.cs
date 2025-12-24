@@ -21,5 +21,7 @@ namespace StudentWebsite.Models
         [Required]
         [MaxLength(50)]
         public string ORG_Organization { get; set; }
+
+        public virtual ICollection<Activity> Activities { get; set; }
     }
 }

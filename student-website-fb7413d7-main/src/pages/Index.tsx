@@ -28,75 +28,96 @@ const Index = () => {
   const [showRegister, setShowRegister] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!idNumber.trim() || !password.trim()) {
-      toast.error("Please fill in all fields");
+  e.preventDefault();
+  
+  if (!idNumber.trim() || !password.trim()) {
+    toast.error("Please fill in all fields");
+    return;
+  }
+
+  setIsLoading(true);
+  
+  try {
+    // Keep special-case admin for now
+    if (idNumber === ADMIN_ID && password === ADMIN_PASSWORD) {
+      localStorage.setItem("currentUser", JSON.stringify({
+        role: "admin",
+        userId: ADMIN_ID,
+      }));
+      toast.success("Welcome, Administrator!");
+      navigate("/admin");
+      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
-    
-    try {
-      // Keep special-case admin for now
-      if (idNumber === ADMIN_ID && password === ADMIN_PASSWORD) {
-        localStorage.setItem("currentUser", JSON.stringify({
-          role: "admin",
-          userId: ADMIN_ID,
-        }));
-        toast.success("Welcome, Administrator!");
-        navigate("/admin");
-        setIsLoading(false);
-        return;
-      }
+    // Debug log the request payload
+    const requestBody = { 
+      userId: idNumber.trim(),
+      password: password 
+    };
+    console.log("Sending login request:", requestBody);
 
-      const res = await fetch("http://localhost:5256/api/accounts/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: idNumber, password }),
-      });
+    const res = await fetch("http://localhost:5256/api/accounts/login", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"  // Explicitly accept JSON response
+      },
+      credentials: 'include',
+      body: JSON.stringify(requestBody)
+    });
 
-      if (!res.ok) {
+    console.log("Response status:", res.status);
+
+    if (!res.ok) {
+      let errorMessage = "Invalid credentials. Please check your ID and password.";
+      try {
+        const errorData = await res.json();
+        console.log("Error response:", errorData);
+        errorMessage = errorData.title || errorData.message || errorMessage;
+      } catch (e) {
         const text = await res.text();
-        toast.error(text || "Invalid credentials. Please check your ID and password.");
-        setIsLoading(false);
-        return;
+        console.log("Raw error response:", text);
+        errorMessage = text || errorMessage;
       }
-
-      const data = await res.json();
-
-      // Save current user from backend
-      localStorage.setItem("currentUser", JSON.stringify(data));
-
-      if (data.role === "student") {
-        // Also keep registeredUser for forms/profile
-        localStorage.setItem("registeredUser", JSON.stringify({
-          accIndex: data.accIndex,
-          accUserId: data.accUserId,
-          accRole: data.role,
-          studId: data.studStudentId,
-          studFirstName: data.studFirstName,
-          studMiddleInitial: data.studMiddleInitial,
-          studLastName: data.studLastName,
-          studYearLevel: data.studYearLevel,
-          studCourse: data.studCourse,
-        }));
-
-        toast.success("Login successful!");
-        navigate("/dashboard");
-      } else if (data.role === "admin") {
-        toast.success("Welcome, Administrator!");
-        navigate("/admin");
-      } else {
-        toast.error("Unknown role.");
-      }
-
-      setIsLoading(false);
-    } catch {
-      setIsLoading(false);
-      toast.error("Unable to sign in. Please try again.");
+      throw new Error(errorMessage);
     }
-  };
+
+    const data = await res.json();
+    console.log("Login successful, user data:", data);
+
+    // Save current user from backend
+    localStorage.setItem("currentUser", JSON.stringify(data));
+
+    if (data.role === "student") {
+      // Also keep registeredUser for forms/profile
+      localStorage.setItem("registeredUser", JSON.stringify({
+        accIndex: data.accIndex,
+        accUserId: data.accUserId,
+        accRole: data.role,
+        studId: data.studStudentId,
+        studFirstName: data.studFirstName,
+        studMiddleInitial: data.studMiddleInitial,
+        studLastName: data.studLastName,
+        studYearLevel: data.studYearLevel,
+        studCourse: data.studCourse,
+      }));
+
+      toast.success("Login successful!");
+      navigate("/dashboard");
+    } else if (data.role === "admin") {
+      toast.success("Welcome, Administrator!");
+      navigate("/admin");
+    } else {
+      toast.error("Unknown role.");
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    toast.error(error instanceof Error ? error.message : "Unable to sign in. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen gradient-mesh flex items-center justify-center p-4">

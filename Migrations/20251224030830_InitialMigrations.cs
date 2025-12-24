@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StudentWebsite.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -64,7 +64,7 @@ namespace StudentWebsite.Migrations
                         column: x => x.ACC_Index,
                         principalTable: "Accounts",
                         principalColumn: "ACC_Index",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,7 +79,7 @@ namespace StudentWebsite.Migrations
                     ACT_ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ACT_IsGranted = table.Column<bool>(type: "bit", nullable: false),
                     STUD_Id = table.Column<int>(type: "int", nullable: true),
-                    ORG_Id = table.Column<int>(type: "int", nullable: true)
+                    ORG_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,7 +88,8 @@ namespace StudentWebsite.Migrations
                         name: "FK_Activities_Organizers_ORG_Id",
                         column: x => x.ORG_Id,
                         principalTable: "Organizers",
-                        principalColumn: "ORG_Id");
+                        principalColumn: "ORG_Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Activities_Students_STUD_Id",
                         column: x => x.STUD_Id,
@@ -102,10 +103,10 @@ namespace StudentWebsite.Migrations
                 {
                     LOCK_Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    STUD_Id = table.Column<int>(type: "int", nullable: false),
-                    LOCK_Spot = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
+                    LOCK_Spot = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LOCK_IsAvailable = table.Column<bool>(type: "bit", nullable: false),
                     LOCK_DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LOCK_IsAvailable = table.Column<bool>(type: "bit", nullable: false)
+                    STUD_Id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -114,8 +115,7 @@ namespace StudentWebsite.Migrations
                         name: "FK_Lockers_Students_STUD_Id",
                         column: x => x.STUD_Id,
                         principalTable: "Students",
-                        principalColumn: "STUD_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "STUD_Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -177,22 +177,16 @@ namespace StudentWebsite.Migrations
                 name: "LockerStatuses",
                 columns: table => new
                 {
-                    LOCK_StatusId = table.Column<int>(type: "int", nullable: false)
+                    LOCKSTATUS_Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LOCK_Id = table.Column<int>(type: "int", nullable: false),
-                    ACC_Index = table.Column<int>(type: "int", nullable: false),
-                    LOCK_IsGranted = table.Column<bool>(type: "bit", nullable: false),
-                    LOCK_Notify = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StatusDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LockerStatuses", x => x.LOCK_StatusId);
-                    table.ForeignKey(
-                        name: "FK_LockerStatuses_Accounts_ACC_Index",
-                        column: x => x.ACC_Index,
-                        principalTable: "Accounts",
-                        principalColumn: "ACC_Index",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_LockerStatuses", x => x.LOCKSTATUS_Id);
                     table.ForeignKey(
                         name: "FK_LockerStatuses_Lockers_LOCK_Id",
                         column: x => x.LOCK_Id,
@@ -253,11 +247,6 @@ namespace StudentWebsite.Migrations
                 column: "STUD_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LockerStatuses_ACC_Index",
-                table: "LockerStatuses",
-                column: "ACC_Index");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LockerStatuses_LOCK_Id",
                 table: "LockerStatuses",
                 column: "LOCK_Id");
@@ -280,7 +269,8 @@ namespace StudentWebsite.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Students_ACC_Index",
                 table: "Students",
-                column: "ACC_Index");
+                column: "ACC_Index",
+                unique: true);
         }
 
         /// <inheritdoc />

@@ -24,7 +24,7 @@ import { toast } from "@/hooks/use-toast";
 
 interface Locker {
   id: string;
-  size: string;
+  spotNumber: string;
   isAvailable: boolean;
   student?: {
     studId: string;
@@ -50,7 +50,9 @@ export function LockerManagement() {
         setIsLoading(true);
         
         // Fetch lockers from the backend
-        const response = await fetch('http://localhost:5256/api/lockers');
+        const response = await fetch('http://localhost:5256/api/lockers', {
+          credentials: 'include'
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch lockers');
         }
@@ -61,31 +63,35 @@ export function LockerManagement() {
         }
         
         // Map the API response to the Locker interface
-        const mappedLockers = data.map(locker => {
-  return {
-    id: locker.lockerNumber,
-    size: locker.size || 'Medium',
-    isAvailable: !locker.isOccupied,
-    student: locker.student ? {
-      studId: locker.student.stud_StudentId || '',
-      name: `${locker.student.stud_FirstName || ''} ${locker.student.stud_LastName || ''}`.trim(),
-      course: locker.student.stud_Course || ''
-    } : undefined,
-    rentalStartDate: locker.rentalStartDate,
-    rentalEndDate: locker.rentalEndDate
-  };
-});
+        const mappedLockers = data.map((locker: any) => {
+          const lockerId = locker.LOCK_Id ?? locker.lock_Id ?? locker.id;
+          const spotNumber = locker.LOCK_Spot ?? locker.lock_Spot ?? locker.spotNumber;
+          const isAvailable = locker.LOCK_IsAvailable ?? locker.lock_IsAvailable ?? locker.isAvailable;
+          const student = locker.Student ?? locker.student;
+  
+        return {
+          id: lockerId?.toString() || '',
+          spotNumber: spotNumber || 'N/A',
+          isAvailable: !!isAvailable,
+          dateCreated: locker.LOCK_DateCreated ?? locker.lock_DateCreated,
+          student: student ? {
+          studId: student.STUD_StudentId ?? student.stud_StudentId ?? student.studentId ?? '',
+          name: `${student.STUD_FirstName ?? student.stud_FirstName ?? ''} ${student.STUD_LastName ?? student.stud_LastName ?? ''}`.trim() || 'Unknown',
+          course: student.STUD_Course ?? student.stud_Course ?? 'N/A'
+          } :   undefined
+        };
+    });
 
-setLockers(mappedLockers);
-        
-      } catch (error) {
+    setLockers(mappedLockers);
+    
+    } catch (error) {
         console.error('Error fetching lockers:', error);
         toast({
           title: "Error",
           description: "Could not load locker data. Please try again later.",
           variant: "destructive"
         });
-        setLockers([]); // Set to empty array instead of mock data
+        setLockers([]);
       } finally {
         setIsLoading(false);
       }
@@ -101,10 +107,7 @@ setLockers(mappedLockers);
   const handleRemoveOccupant = async () => {
     if (!removeLocker) return;
 
-    try {
-      // In a real app, you would call your API here
-      // await fetch(`/api/lockers/${removeLocker.id}/release`, { method: 'POST' });
-      
+    try { 
       setLockers(prevLockers => 
         prevLockers.map(l => 
           l.id === removeLocker.id 
@@ -167,14 +170,14 @@ setLockers(mappedLockers);
                   <div>
                     <h3 className="font-medium">Locker {locker.id}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {locker.size} {!locker.isAvailable && "• Occupied"}
+                      {locker.spotNumber} {!locker.isAvailable && "• Occupied"}
                     </p>
                   </div>
                   <Badge
                     variant={locker.isAvailable ? "default" : "destructive"}
                     className="ml-2"
                   >
-                    {locker.isAvailable ? "Available" : "Occupied"}
+                    {locker.isAvailable ? "Occupied" : "Available"}
                   </Badge>
                 </div>
                 {!locker.isAvailable && locker.student && (
@@ -218,15 +221,15 @@ setLockers(mappedLockers);
                   <p className="text-sm font-medium">Status</p>
                   <p>
                     {selectedLocker.isAvailable ? (
-                      <Badge>Available</Badge>
+                      <Badge>Occupied</Badge>
                     ) : (
-                      <Badge variant="destructive">Occupied</Badge>
+                      <Badge variant="destructive">Available</Badge>
                     )}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Size</p>
-                  <p>{selectedLocker.size}</p>
+                  <p className="text-sm font-medium">Spot Number</p>
+                  <p>{selectedLocker.spotNumber}</p>
                 </div>
               </div>
 

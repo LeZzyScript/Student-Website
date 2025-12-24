@@ -73,7 +73,7 @@ namespace StudentWebsite.Controllers
             var account = new Account
             {
                 ACC_UserId = dto.UserId,
-                ACC_Password = dto.Password, // TODO: hash in real app
+                ACC_Password = dto.Password,
                 ACC_Role = "admin"
             };
 

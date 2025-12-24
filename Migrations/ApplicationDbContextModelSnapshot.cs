@@ -76,7 +76,7 @@ namespace StudentWebsite.Migrations
                     b.Property<DateTime>("ACT_ScheduledDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ORG_Id")
+                    b.Property<int>("ORG_Id")
                         .HasColumnType("int");
 
                     b.Property<int?>("STUD_Id")
@@ -138,10 +138,9 @@ namespace StudentWebsite.Migrations
 
                     b.Property<string>("LOCK_Spot")
                         .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("STUD_Id")
+                    b.Property<int?>("STUD_Id")
                         .HasColumnType("int");
 
                     b.HasKey("LOCK_Id");
@@ -153,29 +152,27 @@ namespace StudentWebsite.Migrations
 
             modelBuilder.Entity("StudentWebsite.Models.LockerStatus", b =>
                 {
-                    b.Property<int>("LOCK_StatusId")
+                    b.Property<int>("LOCKSTATUS_Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LOCK_StatusId"));
-
-                    b.Property<int>("ACC_Index")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LOCKSTATUS_Id"));
 
                     b.Property<int>("LOCK_Id")
                         .HasColumnType("int");
 
-                    b.Property<bool>("LOCK_IsGranted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LOCK_Notify")
+                    b.Property<string>("Notes")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("LOCK_StatusId");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("ACC_Index");
+                    b.Property<DateTime>("StatusDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("LOCKSTATUS_Id");
 
                     b.HasIndex("LOCK_Id");
 
@@ -335,7 +332,8 @@ namespace StudentWebsite.Migrations
 
                     b.HasKey("STUD_Id");
 
-                    b.HasIndex("ACC_Index");
+                    b.HasIndex("ACC_Index")
+                        .IsUnique();
 
                     b.ToTable("Students");
                 });
@@ -343,8 +341,10 @@ namespace StudentWebsite.Migrations
             modelBuilder.Entity("StudentWebsite.Models.Activity", b =>
                 {
                     b.HasOne("StudentWebsite.Models.Organizer", "Organizer")
-                        .WithMany()
-                        .HasForeignKey("ORG_Id");
+                        .WithMany("Activities")
+                        .HasForeignKey("ORG_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("StudentWebsite.Models.Student", "Student")
                         .WithMany()
@@ -364,7 +364,7 @@ namespace StudentWebsite.Migrations
                         .IsRequired();
 
                     b.HasOne("StudentWebsite.Models.Activity", "Activity")
-                        .WithMany()
+                        .WithMany("ActivityStatuses")
                         .HasForeignKey("ACT_Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -378,28 +378,18 @@ namespace StudentWebsite.Migrations
                 {
                     b.HasOne("StudentWebsite.Models.Student", "Student")
                         .WithMany()
-                        .HasForeignKey("STUD_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("STUD_Id");
 
                     b.Navigation("Student");
                 });
 
             modelBuilder.Entity("StudentWebsite.Models.LockerStatus", b =>
                 {
-                    b.HasOne("StudentWebsite.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("ACC_Index")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("StudentWebsite.Models.Locker", "Locker")
-                        .WithMany()
+                        .WithMany("LockerStatuses")
                         .HasForeignKey("LOCK_Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Account");
 
                     b.Navigation("Locker");
                 });
@@ -437,12 +427,27 @@ namespace StudentWebsite.Migrations
             modelBuilder.Entity("StudentWebsite.Models.Student", b =>
                 {
                     b.HasOne("StudentWebsite.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("ACC_Index")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithOne()
+                        .HasForeignKey("StudentWebsite.Models.Student", "ACC_Index")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("StudentWebsite.Models.Activity", b =>
+                {
+                    b.Navigation("ActivityStatuses");
+                });
+
+            modelBuilder.Entity("StudentWebsite.Models.Locker", b =>
+                {
+                    b.Navigation("LockerStatuses");
+                });
+
+            modelBuilder.Entity("StudentWebsite.Models.Organizer", b =>
+                {
+                    b.Navigation("Activities");
                 });
 #pragma warning restore 612, 618
         }

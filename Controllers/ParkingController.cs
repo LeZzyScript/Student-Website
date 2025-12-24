@@ -38,19 +38,19 @@ namespace StudentWebsite.Controllers
                 .Include(p => p.Student)
                 .Select(p => new 
                 {
-                    p.PARK_Spot,
-                    p.PARK_IsAvailable,
-                    p.PARK_VehicleType,
-                    p.PARK_VehicleModel,
-                    p.PARK_Schedule,
-                    p.PARK_ReservationDate,
-                    p.PARK_ExpiryDate,
-                    Student = p.Student != null ? new 
+                    pARK_Spot = p.PARK_Spot,
+                    pARK_IsAvailable = p.PARK_IsAvailable,
+                    pARK_VehicleType = p.PARK_VehicleType,
+                    pARK_VehicleModel = p.PARK_VehicleModel,
+                    pARK_Schedule = p.PARK_Schedule,
+                    pARK_ReservationDate = p.PARK_ReservationDate,
+                    pARK_ExpiryDate = p.PARK_ExpiryDate,
+                    student = p.Student != null ? new 
                     {
-                        p.Student.STUD_StudentId,
-                        p.Student.STUD_FirstName,
-                        p.Student.STUD_LastName,
-                        p.Student.STUD_Course
+                        sTUD_StudentId = p.Student.STUD_StudentId,
+                        sTUD_FirstName = p.Student.STUD_FName,
+                        sTUD_LastName = p.Student.STUD_LName,
+                        sTUD_Course = p.Student.STUD_Course
                     } : null
                 })
                 .ToListAsync();

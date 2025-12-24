@@ -6,26 +6,12 @@ namespace StudentWebsite.Models
     public class LockerStatus
     {
         [Key]
-        public int LOCK_StatusId { get; set; }
-
-        [Required]
+        public int LOCKSTATUS_Id { get; set; }
         public int LOCK_Id { get; set; }
-
-        [ForeignKey(nameof(LOCK_Id))]
-        public Locker Locker { get; set; }
-
-        // Admin account who performed the action
-        [Required]
-        public int ACC_Index { get; set; }
-
-        [ForeignKey(nameof(ACC_Index))]
-        public Account Account { get; set; }
-
-        [Required]
-        public bool LOCK_IsGranted { get; set; }
-
-        [Required]
-        [MaxLength(100)]
-        public string LOCK_Notify { get; set; }
+        public string Status { get; set; }
+        public DateTime StatusDate { get; set; }
+        public string Notes { get; set; }
+        [ForeignKey("LOCK_Id")]
+        public virtual Locker Locker { get; set; }
     }
 }

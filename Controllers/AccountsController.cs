@@ -2,9 +2,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using StudentWebsite.Data;
 using StudentWebsite.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+using System.Collections.Generic;
 
 namespace StudentWebsite.Controllers
 {
@@ -18,6 +23,8 @@ namespace StudentWebsite.Controllers
         {
             _context = context;
         }
+
+        // ===================== DTOs =====================
 
         public class RegisterRequest
         {
@@ -52,8 +59,6 @@ namespace StudentWebsite.Controllers
             public string Role { get; set; }
             public string AccUserId { get; set; }
             public int AccIndex { get; set; }
-
-            // Student info (if role == "student")
             public string StudStudentId { get; set; }
             public string StudFirstName { get; set; }
             public string StudMiddleInitial { get; set; }
@@ -62,7 +67,10 @@ namespace StudentWebsite.Controllers
             public string StudCourse { get; set; }
         }
 
+        // ===================== REGISTER =====================
+
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<ActionResult<RegisterResponse>> Register([FromBody] RegisterRequest request)
         {
             if (request == null ||
@@ -80,7 +88,6 @@ namespace StudentWebsite.Controllers
                 return BadRequest("Year level must be greater than zero.");
             }
 
-            // Check if the userId is already taken
             var existingAccount = await _context.Accounts
                 .FirstOrDefaultAsync(a => a.ACC_UserId == request.UserId);
 
@@ -89,23 +96,21 @@ namespace StudentWebsite.Controllers
                 return Conflict("User ID is already taken.");
             }
 
-            // TODO: hash password in a real application
             var account = new Account
             {
                 ACC_UserId = request.UserId,
-                ACC_Password = request.Password,
+                ACC_Password = request.Password, // PLAIN TEXT
                 ACC_Role = "student"
             };
 
             _context.Accounts.Add(account);
             await _context.SaveChangesAsync();
 
-            // Generate a visible student ID similar to the frontend logic
+            // Generate Student ID: YY + 001–900 + YY
             var year = DateTime.UtcNow.Year;
             var yearPrefix = (year % 100).ToString("00");
-            var random = Random.Shared.Next(1, 900);
-            var padded = random.ToString("000");
-            var studentId = $"{yearPrefix}{padded}{yearPrefix}";
+            var random = Random.Shared.Next(1, 900).ToString("000");
+            var studentId = $"{yearPrefix}{random}{yearPrefix}";
 
             var student = new Student
             {
@@ -123,7 +128,7 @@ namespace StudentWebsite.Controllers
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
-            var response = new RegisterResponse
+            return Ok(new RegisterResponse
             {
                 AccIndex = account.ACC_Index,
                 AccUserId = account.ACC_UserId,
@@ -132,12 +137,13 @@ namespace StudentWebsite.Controllers
                 StudStudentId = student.STUD_StudentId,
                 StudYearLevel = student.STUD_YearLevel,
                 StudCourse = student.STUD_Course
-            };
-
-            return Ok(response);
+            });
         }
 
+        // ===================== LOGIN =====================
+
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
         {
             if (request == null ||
@@ -152,8 +158,29 @@ namespace StudentWebsite.Controllers
 
             if (account == null || account.ACC_Password != request.Password)
             {
-                return Unauthorized("Invalid credentials.");
+                return Unauthorized("Invalid username or password.");
             }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, account.ACC_UserId),
+                new Claim(ClaimTypes.Role, account.ACC_Role),
+                new Claim("UserId", account.ACC_UserId),
+                new Claim("AccountIndex", account.ACC_Index.ToString())
+            };
+
+            var claimsIdentity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTime.UtcNow.AddDays(1)
+                });
 
             var response = new LoginResponse
             {
@@ -180,7 +207,15 @@ namespace StudentWebsite.Controllers
 
             return Ok(response);
         }
+
+        // ===================== LOGOUT =====================
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Ok(new { message = "Logged out successfully" });
+        }
     }
 }
-
-

@@ -22,52 +22,43 @@ namespace StudentWebsite.Data
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure Account relationships
-        modelBuilder.Entity<Account>()
-            .HasMany<ActivityStatus>()
-            .WithOne(a => a.Account)
-            .HasForeignKey(a => a.ACC_Index)
-            .OnDelete(DeleteBehavior.Cascade);
+            // Configure Account relationships
+            modelBuilder.Entity<Account>()
+                .HasMany<ActivityStatus>()
+                .WithOne(a => a.Account)
+                .HasForeignKey(a => a.ACC_Index)
+                .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Account>()
-            .HasOne<Student>()
-            .WithOne(s => s.Account)
-            .HasForeignKey<Student>(s => s.ACC_Index)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        // Activity relationships
-        modelBuilder.Entity<Activity>()
-            .HasMany<ActivityStatus>()
-            .WithOne(a => a.Activity)
-            .HasForeignKey(a => a.ACT_Id)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        // Locker relationships
-        modelBuilder.Entity<Locker>()
-            .HasMany<LockerStatus>()
-            .WithOne(l => l.Locker)
-            .HasForeignKey(l => l.LOCK_Id)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        // Configure Student relationship with Account
-        modelBuilder.Entity<Student>()
-            .HasOne(s => s.Account)
-            .WithMany()
-            .HasForeignKey(s => s.ACC_Index)
-            .OnDelete(DeleteBehavior.Restrict);
-
-    // ParkingStatus
-    modelBuilder.Entity<ParkingStatus>()
-        .HasOne(p => p.Parking)
-        .WithMany()
-        .HasForeignKey(p => p.PARK_Id)
-        .OnDelete(DeleteBehavior.NoAction);
-
-    modelBuilder.Entity<ParkingStatus>()
-        .HasOne(p => p.Account)
-        .WithMany()
-        .HasForeignKey(p => p.ACC_Index)   
-        .OnDelete(DeleteBehavior.NoAction);
-}
+        // Configure Student-Account relationship
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.Account)
+                .WithOne()
+                .HasForeignKey<Student>(s => s.ACC_Index)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Configure Activity-Organizer relationship
+            modelBuilder.Entity<Activity>()
+                .HasOne(a => a.Organizer)
+                .WithMany(o => o.Activities)
+                .HasForeignKey(a => a.ORG_Id)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Configure Locker-Student relationship (one-to-one)
+            modelBuilder.Entity<Locker>()
+                .HasMany(l => l.LockerStatuses)
+                .WithOne(ls => ls.Locker)
+                .HasForeignKey(ls => ls.LOCK_Id)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Configure ParkingStatus-Parking relationship
+            modelBuilder.Entity<ParkingStatus>()
+                .HasOne(p => p.Parking)
+                .WithMany()
+                .HasForeignKey(p => p.PARK_Id)
+                .OnDelete(DeleteBehavior.NoAction);
+            // Configure ParkingStatus-Account relationship
+            modelBuilder.Entity<ParkingStatus>()
+                .HasOne(p => p.Account)
+                .WithMany()
+                .HasForeignKey(p => p.ACC_Index)   
+                .OnDelete(DeleteBehavior.NoAction);
+        }
     }
 }

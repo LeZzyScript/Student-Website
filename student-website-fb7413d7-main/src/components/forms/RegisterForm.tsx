@@ -69,6 +69,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify({
           firstName,
           middleInitial,
@@ -81,34 +82,74 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
       });
 
       if (!response.ok) {
-        const message = await response.text();
-        toast.error(message || "Registration failed");
-        setIsLoading(false);
-        return;
+         let errorMessage = "Registration failed";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.title || errorMessage;
+        } catch (e) {
+          const text = await response.text();
+          if (text) errorMessage = text;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
-
-      const userData = {
-        accIndex: data.accIndex,
-        accUserId: data.accUserId,
-        accRole: data.accRole,
-        studId: data.studStudentId,
-        studFirstName: firstName,
-        studMiddleInitial: middleInitial,
-        studLastName: lastName,
-        studYearLevel: data.studYearLevel,
-        studCourse: data.studCourse,
-      };
-
-      localStorage.setItem("registeredUser", JSON.stringify(userData));
-
-      setGeneratedStudentId(data.studStudentId);
-      setRegistrationComplete(true);
-      setIsLoading(false);
-      onSuccess?.();
-    } catch {
-      toast.error("Unable to register. Please try again.");
+      
+      try {
+        const loginResponse = await fetch("http://localhost:5256/api/accounts/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            userId,
+            password
+          }),
+        });
+        if (!loginResponse.ok) {
+          throw new Error('Auto-login failed');
+        }
+        const loginData = await loginResponse.json();
+        //Update user data with any additional info from login
+        const userData = {
+          accIndex: data.accIndex,
+          accUserId: data.accUserId,
+          accRole: data.accRole,
+          studId: data.studStudentId,
+          studFirstName: firstName,
+          studMiddleInitial: middleInitial,
+          studLastName: lastName,
+          studYearLevel: data.studYearLevel,
+          studCourse: data.studCourse,
+          // Add any additional fields from login response
+          ...loginData
+        };
+        localStorage.setItem("registeredUser", JSON.stringify(userData));
+        setGeneratedStudentId(data.studStudentId);
+        setRegistrationComplete(true);
+        onSuccess?.();
+      } catch (loginError) {
+        // Still proceed with registration success even if auto-login fails
+        const userData = {
+          accIndex: data.accIndex,
+          accUserId: data.accUserId,
+          accRole: data.accRole,
+          studId: data.studStudentId,
+          studFirstName: firstName,
+          studMiddleInitial: middleInitial,
+          studLastName: lastName,
+          studYearLevel: data.studYearLevel,
+          studCourse: data.studCourse,
+        };
+        localStorage.setItem("registeredUser", JSON.stringify(userData));
+        setGeneratedStudentId(data.studStudentId);
+        setRegistrationComplete(true);
+        onSuccess?.();
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Unable to register. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };

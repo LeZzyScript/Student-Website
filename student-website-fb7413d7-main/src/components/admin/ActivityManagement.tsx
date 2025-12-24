@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarPlus, Check, X, Eye, Clock, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { ErrorBoundary } from 'react-error-boundary';
+import { Loader2 } from "lucide-react";
 function ErrorFallback({ error, resetErrorBoundary }) {
   return (
     <div role="alert">
@@ -49,29 +50,64 @@ interface ActivityRequest {
 export function ActivityManagement() {
   const [activities, setActivities] = useState<ActivityRequest[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<ActivityRequest | null>(null);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     const loadActivities = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+        console.log('Fetching activities...');
+        
         const res = await fetch("http://localhost:5256/api/activities");
-        if (!res.ok) return;
+        console.log('Response status:', res.status);
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('Error response:', errorText);
+          throw new Error(`Failed to load activities: ${res.status} ${res.statusText}`);
+        }
+        
         const data = await res.json();
-        const mapped: ActivityRequest[] = data.map((a: any) => ({
-          id: String(a.act_Id),
-          activityName: a.act_Name,
-          description: a.act_Description,
-          organizers: [a.organizer?.org_Organization ?? "Organizer"],
-          submittedBy: a.student ? `${a.student.stud_StudentId}` : "Unknown",
-          submittedDate: a.act_DateCreated ? new Date(a.act_DateCreated).toLocaleDateString() : "N/A",
-          scheduledDate: a.act_ScheduledDate ? new Date(a.act_ScheduledDate).toLocaleDateString() : "Not scheduled",
-          publishedDate: a.act_DateCreated ? new Date(a.act_DateCreated).toLocaleDateString() : "N/A",
-          status: a.act_IsGranted ? "approved" : "pending",
-        }));
+        console.log('Received activities data:', data);
+        
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received from server');
+        }
+        
+        const mapped: ActivityRequest[] = data.map((a: any) => {
+          console.log('Mapping activity:', a);
+          return {
+            id: String(a.act_Id || ''),
+            activityName: a.act_Name || 'Untitled Activity',
+            description: a.act_Description || 'No description provided',
+            organizers: a.organizer ? [a.organizer.org_Organization] : ['Organizer'],
+            submittedBy: a.student ? 
+              `${a.student.stud_FirstName || ''} ${a.student.stud_LastName || ''}`.trim() || 
+              `ID: ${a.student.stud_StudentId || 'Unknown'}` : 
+              'Unknown',
+            submittedDate: a.act_DateCreated || new Date().toISOString(),
+            scheduledDate: a.act_ScheduledDate || 'Not scheduled',
+            publishedDate: a.act_DateCreated || new Date().toISOString(),
+            status: a.act_IsGranted ? 'approved' : 'pending'
+          };
+        });
+        
+        console.log('Mapped activities:', mapped);
         setActivities(mapped);
-      } catch {
-        // ignore
+      } catch (err) {
+        console.error('Error loading activities:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load activities');
+        toast({
+          title: "Error",
+          description: "Failed to load activities. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
+    
     loadActivities();
   }, []);
 
@@ -223,32 +259,31 @@ export function ActivityManagement() {
               {selectedActivity?.activityName}
               {selectedActivity && getStatusBadge(selectedActivity.status)}
             </DialogTitle>
-            // In the dialog section of ActivityManagement.tsx:
-<DialogDescription>
-  <div className="mt-2 space-y-2">
-    <p>{selectedActivity.description}</p>
-    <div className="grid grid-cols-2 gap-4 mt-4">
-      <div>
-        <p className="text-sm font-medium">Published Date</p>
-        <p className="text-sm text-muted-foreground">
-          {selectedActivity.publishedDate}
-        </p>
-      </div>
-      <div>
-        <p className="text-sm font-medium">Scheduled Date</p>
-        <p className="text-sm text-muted-foreground">
-          {selectedActivity.scheduledDate}
-        </p>
-      </div>
-      <div>
-        <p className="text-sm font-medium">Status</p>
-        <div className="mt-1">
-          {getStatusBadge(selectedActivity.status)}
-        </div>
-      </div>
-    </div>
-  </div>
-</DialogDescription>
+            <DialogDescription>
+              <div className="mt-2 space-y-2">
+                {selectedActivity?.description && <p>{selectedActivity.description}</p>}
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <p className="text-sm font-medium">Published Date</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedActivity?.publishedDate}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Scheduled Date</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedActivity?.scheduledDate}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Status</p>
+                    <div className="mt-1">
+                      {selectedActivity && getStatusBadge(selectedActivity.status)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogDescription>
           </DialogHeader>
           
           {selectedActivity && (

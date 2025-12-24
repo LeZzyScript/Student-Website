@@ -90,16 +90,16 @@ export function ActivityRequestForm({ onClose }: { onClose: () => void }) {
 
     (async () => {
       try {
+        const scheduledDate = new Date(formData.scheduledDate).toISOString();
         const response = await fetch("http://localhost:5256/api/activities/request", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            studStudentId: parsed.studId,
-            organizerId: Number(firstOrganizerId),
-            activityName: formData.activityName,
-            description: formData.description,
-            scheduledDate: formData.scheduledDate,
-            publishedDate: new Date().toISOString(),
+            StudStudentId: parsed.studId,
+            OrganizerId: Number(firstOrganizerId),
+            ActivityName: formData.activityName,
+            Description: formData.description,
+            ScheduledDate: scheduledDate,
           }),
         });
 
