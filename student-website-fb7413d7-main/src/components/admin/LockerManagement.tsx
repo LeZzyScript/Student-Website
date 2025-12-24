@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -19,92 +19,123 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Lock, User, X } from "lucide-react";
+import { Lock, User, X, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-interface LockerSpot {
+interface Locker {
   id: string;
-  occupied: boolean;
+  size: string;
+  isAvailable: boolean;
   student?: {
     studId: string;
     name: string;
     course: string;
   };
+  rentalStartDate?: string;
+  rentalEndDate?: string;
 }
 
-// Generate A1-E9 locker grid (same as parking)
-const generateLockerGrid = (): LockerSpot[] => {
-  const rows = ["A", "B", "C", "D", "E"];
-  const spots: LockerSpot[] = [];
-  
-  rows.forEach((row) => {
-    for (let i = 1; i <= 9; i++) {
-      const id = `${row}${i}`;
-      // Some mock occupied spots
-      const isOccupied = ["A2", "B4", "C1", "D6", "E3", "A8"].includes(id);
-      spots.push({
-        id,
-        occupied: isOccupied,
-        student: isOccupied ? {
-          studId: `250${Math.floor(Math.random() * 9)}425`,
-          name: ["Juan Dela Cruz", "Maria Santos", "Pedro Garcia", "Ana Reyes", "Jose Rizal"][Math.floor(Math.random() * 5)],
-          course: ["BSIT", "BSN", "BSCRIM", "BSHM", "BSMT"][Math.floor(Math.random() * 5)],
-        } : undefined,
-      });
-    }
-  });
-  
-  return spots;
-};
+// This function is no longer needed as we're fetching from the database
 
 export function LockerManagement() {
-  const [spots, setSpots] = useState<LockerSpot[]>(generateLockerGrid);
-  const [selectedSpot, setSelectedSpot] = useState<LockerSpot | null>(null);
-  const [removeSpot, setRemoveSpot] = useState<LockerSpot | null>(null);
+  const [lockers, setLockers] = useState<Locker[]>([]);
+  const [selectedLocker, setSelectedLocker] = useState<Locker | null>(null);
+  const [removeLocker, setRemoveLocker] = useState<Locker | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSpotClick = (spot: LockerSpot) => {
-    setSelectedSpot(spot);
+    // Fetch lockers from the backend
+  useEffect(() => {
+    const fetchLockers = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch lockers from the backend
+        const response = await fetch('http://localhost:5256/api/lockers');
+        if (!response.ok) {
+          throw new Error('Failed to fetch lockers');
+        }
+        const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received from server');
+        }
+        
+        // Map the API response to the Locker interface
+        const mappedLockers = data.map(locker => {
+  return {
+    id: locker.lockerNumber,
+    size: locker.size || 'Medium',
+    isAvailable: !locker.isOccupied,
+    student: locker.student ? {
+      studId: locker.student.stud_StudentId || '',
+      name: `${locker.student.stud_FirstName || ''} ${locker.student.stud_LastName || ''}`.trim(),
+      course: locker.student.stud_Course || ''
+    } : undefined,
+    rentalStartDate: locker.rentalStartDate,
+    rentalEndDate: locker.rentalEndDate
   };
+});
 
-  const toggleOccupancy = (spotId: string) => {
-    setSpots(spots.map((spot) => {
-      if (spot.id === spotId) {
-        const newOccupied = !spot.occupied;
-        return {
-          ...spot,
-          occupied: newOccupied,
-          student: newOccupied ? undefined : spot.student,
-        };
+setLockers(mappedLockers);
+        
+      } catch (error) {
+        console.error('Error fetching lockers:', error);
+        toast({
+          title: "Error",
+          description: "Could not load locker data. Please try again later.",
+          variant: "destructive"
+        });
+        setLockers([]); // Set to empty array instead of mock data
+      } finally {
+        setIsLoading(false);
       }
-      return spot;
-    }));
-    setSelectedSpot(null);
-    toast({
-      title: "Locker Updated",
-      description: `Locker ${spotId} has been updated. User will be notified.`,
-    });
+    };
+
+    fetchLockers();
+  }, []);
+
+  const handleLockerClick = (locker: Locker) => {
+    setSelectedLocker(locker);
   };
 
-  const handleRemoveOccupant = () => {
-    if (!removeSpot) return;
-    
-    setSpots(spots.map((spot) => {
-      if (spot.id === removeSpot.id) {
-        return { ...spot, occupied: false, student: undefined };
-      }
-      return spot;
-    }));
-    
-    toast({
-      title: "Occupant Removed",
-      description: `${removeSpot.student?.name} has been removed from locker ${removeSpot.id}. They will be notified.`,
-    });
-    setRemoveSpot(null);
-    setSelectedSpot(null);
+  const handleRemoveOccupant = async () => {
+    if (!removeLocker) return;
+
+    try {
+      // In a real app, you would call your API here
+      // await fetch(`/api/lockers/${removeLocker.id}/release`, { method: 'POST' });
+      
+      setLockers(prevLockers => 
+        prevLockers.map(l => 
+          l.id === removeLocker.id 
+            ? { ...l, isAvailable: true, student: undefined, rentalStartDate: undefined, rentalEndDate: undefined }
+            : l
+        )
+      );
+      
+      toast({
+        title: "Success",
+        description: `Locker ${removeLocker.id} has been released.`,
+      });
+    } catch (error) {
+      console.error('Error releasing locker:', error);
+      toast({
+        title: "Error",
+        description: "Failed to release locker.",
+        variant: "destructive",
+      });
+    } finally {
+      setRemoveLocker(null);
+    }
   };
 
-  const rows = ["A", "B", "C", "D", "E"];
-  const occupiedCount = spots.filter((s) => s.occupied).length;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -113,121 +144,150 @@ export function LockerManagement() {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
-              Locker Grid (A1 - E9)
+              Locker Management
             </div>
-            <div className="flex gap-4 text-sm font-normal">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-green-500/20 border border-green-500" />
-                <span>Available ({45 - occupiedCount})</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-destructive/20 border border-destructive" />
-                <span>Occupied ({occupiedCount})</span>
-              </div>
+            <div className="text-sm font-normal">
+              Total: {lockers.length} | Available: {lockers.filter(l => l.isAvailable).length}
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {rows.map((row) => (
-              <div key={row} className="flex items-center gap-2">
-                <span className="w-6 font-semibold text-muted-foreground">{row}</span>
-                <div className="flex gap-2 flex-wrap">
-                  {spots
-                    .filter((spot) => spot.id.startsWith(row))
-                    .map((spot) => (
-                      <button
-                        key={spot.id}
-                        onClick={() => handleSpotClick(spot)}
-                        className={`
-                          w-14 h-14 rounded-lg border-2 flex flex-col items-center justify-center
-                          transition-all duration-200 hover:scale-105 cursor-pointer
-                          ${spot.occupied 
-                            ? "bg-destructive/10 border-destructive text-destructive hover:bg-destructive/20" 
-                            : "bg-green-500/10 border-green-500 text-green-700 hover:bg-green-500/20"
-                          }
-                        `}
-                      >
-                        <span className="text-xs font-medium">{spot.id}</span>
-                        {spot.occupied && <Lock className="h-4 w-4 mt-0.5" />}
-                      </button>
-                    ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {lockers.map((locker) => (
+              <div
+                key={locker.id}
+                onClick={() => handleLockerClick(locker)}
+                className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                  locker.isAvailable
+                    ? "bg-green-50 hover:bg-green-100 border-green-200"
+                    : "bg-red-50 hover:bg-red-100 border-red-200"
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium">Locker {locker.id}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {locker.size} {!locker.isAvailable && "• Occupied"}
+                    </p>
+                  </div>
+                  <Badge
+                    variant={locker.isAvailable ? "default" : "destructive"}
+                    className="ml-2"
+                  >
+                    {locker.isAvailable ? "Available" : "Occupied"}
+                  </Badge>
                 </div>
+                {!locker.isAvailable && locker.student && (
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="flex items-center gap-2 text-sm">
+                      <User className="h-4 w-4" />
+                      <span>{locker.student.name}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      ID: {locker.student.studId} • {locker.student.course}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Rental: {locker.rentalStartDate} to {locker.rentalEndDate}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Spot Details Dialog */}
-      <Dialog open={!!selectedSpot} onOpenChange={() => setSelectedSpot(null)}>
+      {/* Locker Details Dialog */}
+      <Dialog
+        open={!!selectedLocker}
+        onOpenChange={(open) => !open && setSelectedLocker(null)}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              Locker {selectedSpot?.id}
-              <Badge variant={selectedSpot?.occupied ? "destructive" : "default"}>
-                {selectedSpot?.occupied ? "Occupied" : "Available"}
-              </Badge>
-            </DialogTitle>
+            <DialogTitle>Locker {selectedLocker?.id}</DialogTitle>
             <DialogDescription>
-              {selectedSpot?.occupied 
-                ? "View occupant details or remove them from this locker." 
-                : "This locker is currently available."}
+              {selectedLocker?.isAvailable
+                ? "This locker is currently available."
+                : "Locker rental details."}
             </DialogDescription>
           </DialogHeader>
-          
-          {selectedSpot?.occupied && selectedSpot.student && (
-            <div className="space-y-4 py-4">
-              <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-6 w-6 text-primary" />
-                </div>
+          {selectedLocker && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="font-medium">{selectedSpot.student.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedSpot.student.studId} • {selectedSpot.student.course}
+                  <p className="text-sm font-medium">Status</p>
+                  <p>
+                    {selectedLocker.isAvailable ? (
+                      <Badge>Available</Badge>
+                    ) : (
+                      <Badge variant="destructive">Occupied</Badge>
+                    )}
                   </p>
                 </div>
+                <div>
+                  <p className="text-sm font-medium">Size</p>
+                  <p>{selectedLocker.size}</p>
+                </div>
+              </div>
+
+              {!selectedLocker.isAvailable && selectedLocker.student && (
+                <div className="space-y-2">
+                  <h4 className="font-medium">Rented By</h4>
+                  <div className="bg-muted p-4 rounded-lg">
+                    <p className="font-medium">{selectedLocker.student.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedLocker.student.studId} • {selectedLocker.student.course}
+                    </p>
+                    <div className="mt-2 text-sm">
+                      <p>Rental Period:</p>
+                      <p>
+                        {selectedLocker.rentalStartDate} to {selectedLocker.rentalEndDate}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedLocker(null)}
+                >
+                  Close
+                </Button>
+                {!selectedLocker.isAvailable && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setRemoveLocker(selectedLocker);
+                      setSelectedLocker(null);
+                    }}
+                  >
+                    Release Locker
+                  </Button>
+                )}
               </div>
             </div>
           )}
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => toggleOccupancy(selectedSpot!.id)}
-              className="flex-1"
-            >
-              Mark as {selectedSpot?.occupied ? "Available" : "Occupied"}
-            </Button>
-            {selectedSpot?.occupied && (
-              <Button
-                variant="destructive"
-                onClick={() => setRemoveSpot(selectedSpot)}
-                className="flex items-center gap-2"
-              >
-                <X className="h-4 w-4" />
-                Remove Occupant
-              </Button>
-            )}
-          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Remove Confirmation */}
-      <AlertDialog open={!!removeSpot} onOpenChange={() => setRemoveSpot(null)}>
+      {/* Confirm Release Dialog */}
+      <AlertDialog
+        open={!!removeLocker}
+        onOpenChange={(open) => !open && setRemoveLocker(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Occupant?</AlertDialogTitle>
+            <AlertDialogTitle>Release Locker {removeLocker?.id}?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove {removeSpot?.student?.name} from locker {removeSpot?.id}. 
-              They will receive a notification about this change.
+              This will mark the locker as available. The current occupant will no longer have access.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRemoveOccupant} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Remove
+            <AlertDialogAction onClick={handleRemoveOccupant}>
+              Confirm Release
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

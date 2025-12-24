@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,8 @@ import {
   ChevronDown, 
   LogOut,
   Plus,
-  Eye
+  Eye,
+  User
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,6 +38,37 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [hasParking, setHasParking] = useState(false);
   const [openDialog, setOpenDialog] = useState<DialogType>(null);
+  const [studentName, setStudentName] = useState("Student Dashboard");
+  const [studentInitials, setStudentInitials] = useState("ST");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("registeredUser");
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored) as {
+        studFirstName?: string;
+        studMiddleInitial?: string;
+        studLastName?: string;
+      };
+      const first = parsed.studFirstName?.trim() ?? "";
+      const middle = parsed.studMiddleInitial?.trim() ?? "";
+      const last = parsed.studLastName?.trim() ?? "";
+
+      const fullName = [first, middle && `${middle}.`, last].filter(Boolean).join(" ");
+      if (fullName) {
+        setStudentName(fullName);
+      }
+
+      const initials =
+        (first ? first[0].toUpperCase() : "") +
+        (last ? last[0].toUpperCase() : "");
+      if (initials) {
+        setStudentInitials(initials);
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
 
   const handleLogout = () => {
     navigate("/");
@@ -133,15 +165,21 @@ const Dashboard = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-2 md:px-3">
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-primary font-medium text-sm">JD</span>
+                    <span className="text-primary font-medium text-sm">
+                      {studentInitials}
+                    </span>
                   </div>
                   <span className="hidden md:block text-sm font-medium text-foreground">
-                    Student Dashboard
+                    {studentName}
                   </span>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => navigate("/dashboard/profile")}>
+                  <User className="mr-2 h-4 w-4" />
+                  {studentName}
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />

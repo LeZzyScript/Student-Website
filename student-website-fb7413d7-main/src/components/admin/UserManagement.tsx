@@ -36,6 +36,9 @@ import { toast } from "@/hooks/use-toast";
 interface Student {
   id: string;
   studId: string;
+  firstName: string;
+  middleInitial: string;
+  lastName: string;
   yearLevel: number;
   course: string;
   accUserId: string;
@@ -69,6 +72,9 @@ export function UserManagement() {
           const mappedStudents: Student[] = sData.map((s: any) => ({
             id: String(s.studId),
             studId: s.studStudentId,
+            firstName: s.firstName,
+            middleInitial: s.middleInitial ?? "",
+            lastName: s.lastName,
             yearLevel: s.yearLevel,
             course: s.course,
             accUserId: s.accUserId,
@@ -172,6 +178,7 @@ export function UserManagement() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Student ID</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>User ID</TableHead>
                     <TableHead>Year Level</TableHead>
                     <TableHead>Course</TableHead>
@@ -182,6 +189,11 @@ export function UserManagement() {
                   {students.map((student) => (
                     <TableRow key={student.id}>
                       <TableCell className="font-medium">{student.studId}</TableCell>
+                      <TableCell>
+                        {student.firstName}{" "}
+                        {student.middleInitial && `${student.middleInitial}. ` }
+                        {student.lastName}
+                      </TableCell>
                       <TableCell>{student.accUserId}</TableCell>
                       <TableCell>{student.yearLevel}</TableCell>
                       <TableCell>

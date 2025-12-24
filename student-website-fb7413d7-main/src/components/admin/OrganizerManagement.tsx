@@ -33,10 +33,10 @@ import { toast } from "@/hooks/use-toast";
 
 interface Organizer {
   id: number;
-  firstName: string;
-  middleInitial: string;
-  lastName: string;
-  organization: string;
+  ORG_FName: string;
+  ORG_MiddleI?: string;
+  ORG_LName: string;
+  ORG_Organization: string;
 }
 
 export function OrganizerManagement() {
@@ -45,10 +45,10 @@ export function OrganizerManagement() {
   const [editOrganizer, setEditOrganizer] = useState<Organizer | null>(null);
   const [deleteOrganizer, setDeleteOrganizer] = useState<Organizer | null>(null);
   const [formData, setFormData] = useState({
-    firstName: "",
-    middleInitial: "",
-    lastName: "",
-    organization: "",
+    ORG_FName: "",
+    ORG_MiddleI: "",
+    ORG_LName: "",
+    ORG_Organization: "",
   });
 
   useEffect(() => {
@@ -57,28 +57,32 @@ export function OrganizerManagement() {
         const res = await fetch("http://localhost:5256/api/organizers");
         if (!res.ok) return;
         const data = await res.json();
-        const mapped: Organizer[] = data.map((o: any) => ({
-          id: o.org_Id,
-          firstName: o.org_FName,
-          middleInitial: o.org_MiddleI ?? "",
-          lastName: o.org_LName,
-          organization: o.org_Organization,
+        const mapped: Organizer[] = data.map((org: any) => ({
+          id: org.ORG_Id,
+          ORG_FName: org.ORG_FName,
+      ORG_MiddleI: org.ORG_MiddleI ?? "",
+      ORG_LName: org.ORG_LName,
+      ORG_Organization: org.ORG_Organization
         }));
         setOrganizers(mapped);
       } catch {
-        // ignore
+        toast({
+          title: "Error",
+          description: "Failed to load organizers. Please try again later.",
+          variant: "destructive",
+        });
       }
     };
     loadOrganizers();
   }, []);
 
   const resetForm = () => {
-    setFormData({ firstName: "", middleInitial: "", lastName: "", organization: "" });
+    setFormData({ ORG_FName: "", ORG_MiddleI: "", ORG_LName: "", ORG_Organization: "" });
   };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.firstName || !formData.lastName || !formData.organization) {
+    if (!formData.ORG_FName || !formData.ORG_LName || !formData.ORG_Organization) {
       toast({ title: "Error", description: "Please fill in required fields.", variant: "destructive" });
       return;
     }
@@ -88,10 +92,10 @@ export function OrganizerManagement() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: formData.firstName,
-          middleInitial: formData.middleInitial,
-          lastName: formData.lastName,
-          organization: formData.organization,
+          ORG_FName: formData.ORG_FName,
+          ORG_MiddleI: formData.ORG_MiddleI,
+          ORG_LName: formData.ORG_LName,
+          ORG_Organization: formData.ORG_Organization,
         }),
       });
       if (!res.ok) {
@@ -101,18 +105,18 @@ export function OrganizerManagement() {
       }
       const data = await res.json();
       const newOrganizer: Organizer = {
-        id: data.org_Id,
-        firstName: data.org_FName,
-        middleInitial: data.org_MiddleI ?? "",
-        lastName: data.org_LName,
-        organization: data.org_Organization,
+        id: data.ORG_Id,
+        ORG_FName: data.ORG_FName,
+        ORG_MiddleI: data.ORG_MiddleI ?? "",
+        ORG_LName: data.ORG_LName,
+        ORG_Organization: data.ORG_Organization,
       };
       setOrganizers([...organizers, newOrganizer]);
       resetForm();
       setShowAddDialog(false);
       toast({
         title: "Organizer Added",
-        description: `${newOrganizer.firstName} ${newOrganizer.lastName} has been added. Activity forms will be updated.`,
+        description: `${newOrganizer.ORG_FName} ${newOrganizer.ORG_LName} has been added. Activity forms will be updated.`,
       });
     } catch {
       toast({ title: "Error", description: "Unable to contact server.", variant: "destructive" });
@@ -121,7 +125,7 @@ export function OrganizerManagement() {
 
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editOrganizer || !formData.firstName || !formData.lastName || !formData.organization) {
+    if (!editOrganizer || !formData.ORG_FName || !formData.ORG_LName || !formData.ORG_Organization) {
       toast({ title: "Error", description: "Please fill in required fields.", variant: "destructive" });
       return;
     }
@@ -131,10 +135,10 @@ export function OrganizerManagement() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName: formData.firstName,
-          middleInitial: formData.middleInitial,
-          lastName: formData.lastName,
-          organization: formData.organization,
+          ORG_FName: formData.ORG_FName,
+          ORG_MiddleI: formData.ORG_MiddleI,
+          ORG_LName: formData.ORG_LName,
+          ORG_Organization: formData.ORG_Organization,
         }),
       });
       if (!res.ok) {
@@ -144,11 +148,11 @@ export function OrganizerManagement() {
       }
       const data = await res.json();
       const updated: Organizer = {
-        id: data.org_Id,
-        firstName: data.org_FName,
-        middleInitial: data.org_MiddleI ?? "",
-        lastName: data.org_LName,
-        organization: data.org_Organization,
+        id: data.ORG_Id,
+        ORG_FName: data.ORG_FName,
+        ORG_MiddleI: data.ORG_MiddleI ?? "",
+        ORG_LName: data.ORG_LName,
+        ORG_Organization: data.ORG_Organization,
       };
       setOrganizers(organizers.map((o) => (o.id === updated.id ? updated : o)));
       resetForm();
@@ -176,7 +180,7 @@ export function OrganizerManagement() {
       setOrganizers(organizers.filter((o) => o.id !== deleteOrganizer.id));
       toast({
         title: "Organizer Removed",
-        description: `${deleteOrganizer.firstName} ${deleteOrganizer.lastName} has been removed. Activity forms will be updated.`,
+        description: `${deleteOrganizer.ORG_FName} ${deleteOrganizer.ORG_LName} has been removed. Activity forms will be updated.`,
       });
       setDeleteOrganizer(null);
     } catch {
@@ -186,10 +190,10 @@ export function OrganizerManagement() {
 
   const openEditDialog = (organizer: Organizer) => {
     setFormData({
-      firstName: organizer.firstName,
-      middleInitial: organizer.middleInitial,
-      lastName: organizer.lastName,
-      organization: organizer.organization,
+      ORG_FName: organizer.ORG_FName,
+      ORG_MiddleI: organizer.ORG_MiddleI ?? "",
+      ORG_LName: organizer.ORG_LName,
+      ORG_Organization: organizer.ORG_Organization,
     });
     setEditOrganizer(organizer);
   };
@@ -222,9 +226,11 @@ export function OrganizerManagement() {
                 <TableRow key={organizer.id}>
                   <TableCell className="font-medium">{organizer.id}</TableCell>
                   <TableCell>
-                    {organizer.firstName} {organizer.middleInitial && `${organizer.middleInitial}. `}{organizer.lastName}
+                    {organizer.ORG_FName} 
+                    {organizer.ORG_MiddleI && `${organizer.ORG_MiddleI}. `}
+                    {organizer.ORG_LName}
                   </TableCell>
-                  <TableCell>{organizer.organization}</TableCell>
+                  <TableCell>{organizer.ORG_Organization}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button size="sm" variant="ghost" onClick={() => openEditDialog(organizer)}>
@@ -253,20 +259,20 @@ export function OrganizerManagement() {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name *</Label>
-                <Input id="firstName" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
+                <Input id="firstName" value={formData.ORG_FName} onChange={(e) => setFormData({ ...formData, ORG_FName: e.target.value })} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="middleInitial">M.I.</Label>
-                <Input id="middleInitial" maxLength={1} value={formData.middleInitial} onChange={(e) => setFormData({ ...formData, middleInitial: e.target.value.toUpperCase() })} />
+                <Input id="middleInitial" maxLength={1} value={formData.ORG_MiddleI} onChange={(e) => setFormData({ ...formData, ORG_MiddleI: e.target.value.toUpperCase() })} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name *</Label>
-                <Input id="lastName" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
+                <Input id="lastName" value={formData.ORG_LName} onChange={(e) => setFormData({ ...formData, ORG_LName: e.target.value })} />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="organization">Organization *</Label>
-              <Input id="organization" value={formData.organization} onChange={(e) => setFormData({ ...formData, organization: e.target.value })} placeholder="e.g., Student Council" />
+              <Input id="organization" value={formData.ORG_Organization} onChange={(e) => setFormData({ ...formData, ORG_Organization: e.target.value })} placeholder="e.g., Student Council" />
             </div>
             <div className="flex gap-3 pt-4">
               <Button type="button" variant="outline" onClick={() => { setShowAddDialog(false); resetForm(); }} className="flex-1">Cancel</Button>
@@ -287,20 +293,20 @@ export function OrganizerManagement() {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="editFirstName">First Name *</Label>
-                <Input id="editFirstName" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
+                <Input id="editFirstName" value={formData.ORG_FName} onChange={(e) => setFormData({ ...formData, ORG_FName: e.target.value })} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="editMiddleInitial">M.I.</Label>
-                <Input id="editMiddleInitial" maxLength={1} value={formData.middleInitial} onChange={(e) => setFormData({ ...formData, middleInitial: e.target.value.toUpperCase() })} />
+                <Input id="editMiddleInitial" maxLength={1} value={formData.ORG_MiddleI} onChange={(e) => setFormData({ ...formData, ORG_MiddleI: e.target.value.toUpperCase() })} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="editLastName">Last Name *</Label>
-                <Input id="editLastName" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
+                <Input id="editLastName" value={formData.ORG_LName} onChange={(e) => setFormData({ ...formData, ORG_LName: e.target.value })} />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="editOrganization">Organization *</Label>
-              <Input id="editOrganization" value={formData.organization} onChange={(e) => setFormData({ ...formData, organization: e.target.value })} />
+              <Input id="editOrganization" value={formData.ORG_Organization} onChange={(e) => setFormData({ ...formData, ORG_MiddleI: e.target.value })} />
             </div>
             <div className="flex gap-3 pt-4">
               <Button type="button" variant="outline" onClick={() => { setEditOrganizer(null); resetForm(); }} className="flex-1">Cancel</Button>
@@ -316,7 +322,7 @@ export function OrganizerManagement() {
           <AlertDialogHeader>
             <AlertDialogTitle>Remove Organizer?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove {deleteOrganizer?.firstName} {deleteOrganizer?.lastName} from {deleteOrganizer?.organization}. 
+              This will remove {deleteOrganizer?.ORG_FName} {deleteOrganizer?.ORG_LName} from {deleteOrganizer?.ORG_Organization}. 
               They will no longer appear in activity request forms.
             </AlertDialogDescription>
           </AlertDialogHeader>

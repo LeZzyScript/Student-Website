@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,35 @@ namespace StudentWebsite.Controllers
             public string VehicleType { get; set; }
             public string VehicleModel { get; set; }
             public string Schedule { get; set; } // "am" or "pm" from frontend
+            public DateTime ReservationDate { get; set; }
+            public DateTime ExpiryDate { get; set; }
+        }
+
+        [HttpGet("spots")]
+        public async Task<ActionResult<IEnumerable<object>>> GetParkingSpots()
+        {
+            var spots = await _context.Parkings
+                .Include(p => p.Student)
+                .Select(p => new 
+                {
+                    p.PARK_Spot,
+                    p.PARK_IsAvailable,
+                    p.PARK_VehicleType,
+                    p.PARK_VehicleModel,
+                    p.PARK_Schedule,
+                    p.PARK_ReservationDate,
+                    p.PARK_ExpiryDate,
+                    Student = p.Student != null ? new 
+                    {
+                        p.Student.STUD_StudentId,
+                        p.Student.STUD_FirstName,
+                        p.Student.STUD_LastName,
+                        p.Student.STUD_Course
+                    } : null
+                })
+                .ToListAsync();
+
+            return Ok(spots);
         }
 
         [HttpPost("reserve")]
@@ -64,6 +94,8 @@ namespace StudentWebsite.Controllers
                 PARK_VehicleModel = request.VehicleModel,
                 PARK_Schedule = request.Schedule.ToUpperInvariant(), // "AM"/"PM"
                 PARK_DateCreated = DateTime.UtcNow,
+                PARK_ReservationDate = request.ReservationDate,
+                PARK_ExpiryDate = request.ExpiryDate,
                 PARK_IsAvailable = false
             };
 

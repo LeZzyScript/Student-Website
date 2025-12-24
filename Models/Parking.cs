@@ -36,6 +36,11 @@ namespace StudentWebsite.Models
 
         [Required]
         public DateTime PARK_DateCreated { get; set; }
+        [Required]
+        public DateTime PARK_ReservationDate { get; set; }
+
+        [Required]
+        public DateTime PARK_ExpiryDate { get; set; }
 
         [Required]
         public bool PARK_IsAvailable { get; set; } = true;

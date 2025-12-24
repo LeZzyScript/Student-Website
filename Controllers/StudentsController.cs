@@ -22,6 +22,9 @@ namespace StudentWebsite.Controllers
         {
             public int StudId { get; set; }
             public string StudStudentId { get; set; }
+            public string FirstName { get; set; }
+            public string MiddleInitial { get; set; }
+            public string LastName { get; set; }
             public int YearLevel { get; set; }
             public string Course { get; set; }
             public string AccUserId { get; set; }
@@ -36,6 +39,9 @@ namespace StudentWebsite.Controllers
                 {
                     StudId = s.STUD_Id,
                     StudStudentId = s.STUD_StudentId,
+                    FirstName = s.STUD_FName,
+                    MiddleInitial = s.STUD_MiddleI,
+                    LastName = s.STUD_LName,
                     YearLevel = s.STUD_YearLevel,
                     Course = s.STUD_Course,
                     AccUserId = s.Account.ACC_UserId

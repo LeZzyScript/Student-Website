@@ -33,6 +33,9 @@
         </nav>
     </header>
     <div class="container">
+        <div id="notification-container" class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+            <!-- Notifications will be inserted here -->
+        </div>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -46,6 +49,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/site-custom.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

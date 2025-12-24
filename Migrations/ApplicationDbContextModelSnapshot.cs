@@ -58,23 +58,28 @@ namespace StudentWebsite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ACT_Id"));
 
+                    b.Property<DateTime>("ACT_DateCreated")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ACT_Description")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("ACT_IsGranted")
                         .HasColumnType("bit");
 
                     b.Property<string>("ACT_Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("ORG_Id")
+                    b.Property<DateTime>("ACT_ScheduledDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ORG_Id")
                         .HasColumnType("int");
 
-                    b.Property<int>("STUD_Id")
+                    b.Property<int?>("STUD_Id")
                         .HasColumnType("int");
 
                     b.HasKey("ACT_Id");
@@ -220,8 +225,14 @@ namespace StudentWebsite.Migrations
                     b.Property<DateTime>("PARK_DateCreated")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("PARK_ExpiryDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("PARK_IsAvailable")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("PARK_ReservationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PARK_Schedule")
                         .IsRequired()
@@ -300,6 +311,20 @@ namespace StudentWebsite.Migrations
                         .HasMaxLength(4)
                         .HasColumnType("nvarchar(4)");
 
+                    b.Property<string>("STUD_FName")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("STUD_LName")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("STUD_MiddleI")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
+
                     b.Property<string>("STUD_StudentId")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -319,15 +344,11 @@ namespace StudentWebsite.Migrations
                 {
                     b.HasOne("StudentWebsite.Models.Organizer", "Organizer")
                         .WithMany()
-                        .HasForeignKey("ORG_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ORG_Id");
 
                     b.HasOne("StudentWebsite.Models.Student", "Student")
                         .WithMany()
-                        .HasForeignKey("STUD_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("STUD_Id");
 
                     b.Navigation("Organizer");
 
@@ -339,13 +360,13 @@ namespace StudentWebsite.Migrations
                     b.HasOne("StudentWebsite.Models.Account", "Account")
                         .WithMany()
                         .HasForeignKey("ACC_Index")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("StudentWebsite.Models.Activity", "Activity")
                         .WithMany()
                         .HasForeignKey("ACT_Id")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
@@ -369,13 +390,13 @@ namespace StudentWebsite.Migrations
                     b.HasOne("StudentWebsite.Models.Account", "Account")
                         .WithMany()
                         .HasForeignKey("ACC_Index")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("StudentWebsite.Models.Locker", "Locker")
                         .WithMany()
                         .HasForeignKey("LOCK_Id")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
@@ -418,7 +439,7 @@ namespace StudentWebsite.Migrations
                     b.HasOne("StudentWebsite.Models.Account", "Account")
                         .WithMany()
                         .HasForeignKey("ACC_Index")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Account");

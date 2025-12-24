@@ -37,11 +37,8 @@ const Index = () => {
 
     setIsLoading(true);
     
-    // Simulate login check
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      // Check if admin
+    try {
+      // Keep special-case admin for now
       if (idNumber === ADMIN_ID && password === ADMIN_PASSWORD) {
         localStorage.setItem("currentUser", JSON.stringify({
           role: "admin",
@@ -49,26 +46,56 @@ const Index = () => {
         }));
         toast.success("Welcome, Administrator!");
         navigate("/admin");
+        setIsLoading(false);
         return;
       }
 
-      // Check if registered student
-      const registeredUser = localStorage.getItem("registeredUser");
-      if (registeredUser) {
-        const user = JSON.parse(registeredUser);
-        if (user.accUserId === idNumber) {
-          localStorage.setItem("currentUser", JSON.stringify({
-            role: "student",
-            ...user,
-          }));
-          toast.success("Login successful!");
-          navigate("/dashboard");
-          return;
-        }
+      const res = await fetch("http://localhost:5256/api/accounts/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: idNumber, password }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        toast.error(text || "Invalid credentials. Please check your ID and password.");
+        setIsLoading(false);
+        return;
       }
 
-      toast.error("Invalid credentials. Please check your ID and password.");
-    }, 1500);
+      const data = await res.json();
+
+      // Save current user from backend
+      localStorage.setItem("currentUser", JSON.stringify(data));
+
+      if (data.role === "student") {
+        // Also keep registeredUser for forms/profile
+        localStorage.setItem("registeredUser", JSON.stringify({
+          accIndex: data.accIndex,
+          accUserId: data.accUserId,
+          accRole: data.role,
+          studId: data.studStudentId,
+          studFirstName: data.studFirstName,
+          studMiddleInitial: data.studMiddleInitial,
+          studLastName: data.studLastName,
+          studYearLevel: data.studYearLevel,
+          studCourse: data.studCourse,
+        }));
+
+        toast.success("Login successful!");
+        navigate("/dashboard");
+      } else if (data.role === "admin") {
+        toast.success("Welcome, Administrator!");
+        navigate("/admin");
+      } else {
+        toast.error("Unknown role.");
+      }
+
+      setIsLoading(false);
+    } catch {
+      setIsLoading(false);
+      toast.error("Unable to sign in. Please try again.");
+    }
   };
 
   return (
@@ -165,7 +192,7 @@ const Index = () => {
 
       {/* Register Dialog */}
       <Dialog open={showRegister} onOpenChange={setShowRegister}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create Account</DialogTitle>
             <DialogDescription>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ interface ActivityFormData {
   organizerIds: string[];
   activityName: string;
   description: string;
+  scheduledDate: string;
 }
 
 interface OrganizerOption {
@@ -22,6 +23,7 @@ export function ActivityRequestForm({ onClose }: { onClose: () => void }) {
     organizerIds: [],
     activityName: "",
     description: "",
+    scheduledDate: new Date().toISOString().split('T')[0],
   });
   const [organizers, setOrganizers] = useState<OrganizerOption[]>([]);
 
@@ -96,6 +98,8 @@ export function ActivityRequestForm({ onClose }: { onClose: () => void }) {
             organizerId: Number(firstOrganizerId),
             activityName: formData.activityName,
             description: formData.description,
+            scheduledDate: formData.scheduledDate,
+            publishedDate: new Date().toISOString(),
           }),
         });
 
@@ -170,6 +174,17 @@ export function ActivityRequestForm({ onClose }: { onClose: () => void }) {
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           rows={4}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="scheduledDate">Scheduled Date *</Label>
+        <Input
+          id="scheduledDate"
+          type="date"
+          value={formData.scheduledDate}
+          onChange={(e) => setFormData({...formData, scheduledDate: e.target.value})}
+          min={new Date().toISOString().split('T')[0]}
+          required
         />
       </div>
 

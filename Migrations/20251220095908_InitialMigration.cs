@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StudentWebsite.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrations : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,6 +48,9 @@ namespace StudentWebsite.Migrations
                 {
                     STUD_Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    STUD_FName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
+                    STUD_MiddleI = table.Column<string>(type: "nvarchar(1)", maxLength: 1, nullable: true),
+                    STUD_LName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
                     STUD_StudentId = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     STUD_YearLevel = table.Column<int>(type: "int", nullable: false),
                     STUD_Course = table.Column<string>(type: "nvarchar(4)", maxLength: 4, nullable: false),
@@ -61,7 +64,7 @@ namespace StudentWebsite.Migrations
                         column: x => x.ACC_Index,
                         principalTable: "Accounts",
                         principalColumn: "ACC_Index",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,11 +73,13 @@ namespace StudentWebsite.Migrations
                 {
                     ACT_Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    STUD_Id = table.Column<int>(type: "int", nullable: false),
-                    ORG_Id = table.Column<int>(type: "int", nullable: false),
-                    ACT_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ACT_Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ACT_IsGranted = table.Column<bool>(type: "bit", nullable: false)
+                    ACT_Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ACT_Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ACT_DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ACT_ScheduledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ACT_IsGranted = table.Column<bool>(type: "bit", nullable: false),
+                    STUD_Id = table.Column<int>(type: "int", nullable: true),
+                    ORG_Id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -83,14 +88,12 @@ namespace StudentWebsite.Migrations
                         name: "FK_Activities_Organizers_ORG_Id",
                         column: x => x.ORG_Id,
                         principalTable: "Organizers",
-                        principalColumn: "ORG_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ORG_Id");
                     table.ForeignKey(
                         name: "FK_Activities_Students_STUD_Id",
                         column: x => x.STUD_Id,
                         principalTable: "Students",
-                        principalColumn: "STUD_Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "STUD_Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -127,6 +130,8 @@ namespace StudentWebsite.Migrations
                     PARK_VehicleModel = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     PARK_Schedule = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
                     PARK_DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PARK_ReservationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PARK_ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PARK_IsAvailable = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -158,12 +163,14 @@ namespace StudentWebsite.Migrations
                         name: "FK_ActivityStatuses_Accounts_ACC_Index",
                         column: x => x.ACC_Index,
                         principalTable: "Accounts",
-                        principalColumn: "ACC_Index");
+                        principalColumn: "ACC_Index",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ActivityStatuses_Activities_ACT_Id",
                         column: x => x.ACT_Id,
                         principalTable: "Activities",
-                        principalColumn: "ACT_Id");
+                        principalColumn: "ACT_Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,12 +191,14 @@ namespace StudentWebsite.Migrations
                         name: "FK_LockerStatuses_Accounts_ACC_Index",
                         column: x => x.ACC_Index,
                         principalTable: "Accounts",
-                        principalColumn: "ACC_Index");
+                        principalColumn: "ACC_Index",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_LockerStatuses_Lockers_LOCK_Id",
                         column: x => x.LOCK_Id,
                         principalTable: "Lockers",
-                        principalColumn: "LOCK_Id");
+                        principalColumn: "LOCK_Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

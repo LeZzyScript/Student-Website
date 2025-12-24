@@ -20,6 +20,19 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarPlus, Check, X, Eye, Clock, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { ErrorBoundary } from 'react-error-boundary';
+function ErrorFallback({ error, resetErrorBoundary }) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Try again</button>
+    </div>
+  );
+}
+<ErrorBoundary FallbackComponent={ErrorFallback}>
+  <ActivityManagement />
+</ErrorBoundary>
 
 interface ActivityRequest {
   id: string;
@@ -28,6 +41,8 @@ interface ActivityRequest {
   organizers: string[];
   submittedBy: string;
   submittedDate: string;
+  scheduledDate: string;  
+  publishedDate: string;  
   status: "pending" | "approved" | "declined";
 }
 
@@ -47,7 +62,9 @@ export function ActivityManagement() {
           description: a.act_Description,
           organizers: [a.organizer?.org_Organization ?? "Organizer"],
           submittedBy: a.student ? `${a.student.stud_StudentId}` : "Unknown",
-          submittedDate: new Date().toISOString().slice(0, 10),
+          submittedDate: a.act_DateCreated ? new Date(a.act_DateCreated).toLocaleDateString() : "N/A",
+          scheduledDate: a.act_ScheduledDate ? new Date(a.act_ScheduledDate).toLocaleDateString() : "Not scheduled",
+          publishedDate: a.act_DateCreated ? new Date(a.act_DateCreated).toLocaleDateString() : "N/A",
           status: a.act_IsGranted ? "approved" : "pending",
         }));
         setActivities(mapped);
@@ -101,55 +118,56 @@ export function ActivityManagement() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Activity Name</TableHead>
-          <TableHead>Organizers</TableHead>
+          <TableHead>Activity</TableHead>
+          <TableHead>Organizer</TableHead>
           <TableHead>Submitted By</TableHead>
-          <TableHead>Date</TableHead>
+          <TableHead>Published Date</TableHead>
+          <TableHead>Scheduled Date</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          {showActions && <TableHead>Actions</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.length === 0 ? (
-          <TableRow>
-            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-              No activities found
-            </TableCell>
-          </TableRow>
-        ) : (
-          items.map((activity) => (
-            <TableRow key={activity.id}>
-              <TableCell className="font-medium">{activity.activityName}</TableCell>
+        {items.map((activity) => (
+          <TableRow key={activity.id}>
+            <TableCell className="font-medium">{activity.activityName}</TableCell>
+            <TableCell>{activity.organizers.join(", ")}</TableCell>
+            <TableCell>{activity.submittedBy}</TableCell>
+            <TableCell>{new Date(activity.submittedDate).toLocaleDateString()}</TableCell>
+            <TableCell>{new Date(activity.scheduledDate).toLocaleDateString()}</TableCell>
+            <TableCell>{getStatusBadge(activity.status)}</TableCell>
+            {showActions && (
               <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {activity.organizers.map((org) => (
-                    <Badge key={org} variant="outline" className="text-xs">{org}</Badge>
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell>{activity.submittedBy}</TableCell>
-              <TableCell>{activity.submittedDate}</TableCell>
-              <TableCell>{getStatusBadge(activity.status)}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => setSelectedActivity(activity)}>
-                    <Eye className="h-4 w-4" />
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedActivity(activity)}
+                  >
+                    <Eye className="h-4 w-4 mr-1" /> View
                   </Button>
-                  {showActions && (
-                    <>
-                      <Button size="sm" variant="ghost" className="text-green-600" onClick={() => handleApprove(activity.id)}>
-                        <Check className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleDecline(activity.id)}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </>
-                  )}
+                  {activity.status === "pending" && (
+                  <>
+                    <Button
+                      size="sm"
+                      onClick={() => handleApprove(activity.id)}
+                    >
+                      <Check className="h-4 w-4 mr-1" /> Approve
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDecline(activity.id)}
+                    >
+                      <X className="h-4 w-4 mr-1" /> Decline
+                    </Button>
+                  </>
+                )}
                 </div>
               </TableCell>
-            </TableRow>
-          ))
-        )}
+            )}
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );
@@ -205,9 +223,32 @@ export function ActivityManagement() {
               {selectedActivity?.activityName}
               {selectedActivity && getStatusBadge(selectedActivity.status)}
             </DialogTitle>
-            <DialogDescription>
-              Submitted by {selectedActivity?.submittedBy} on {selectedActivity?.submittedDate}
-            </DialogDescription>
+            // In the dialog section of ActivityManagement.tsx:
+<DialogDescription>
+  <div className="mt-2 space-y-2">
+    <p>{selectedActivity.description}</p>
+    <div className="grid grid-cols-2 gap-4 mt-4">
+      <div>
+        <p className="text-sm font-medium">Published Date</p>
+        <p className="text-sm text-muted-foreground">
+          {selectedActivity.publishedDate}
+        </p>
+      </div>
+      <div>
+        <p className="text-sm font-medium">Scheduled Date</p>
+        <p className="text-sm text-muted-foreground">
+          {selectedActivity.scheduledDate}
+        </p>
+      </div>
+      <div>
+        <p className="text-sm font-medium">Status</p>
+        <div className="mt-1">
+          {getStatusBadge(selectedActivity.status)}
+        </div>
+      </div>
+    </div>
+  </div>
+</DialogDescription>
           </DialogHeader>
           
           {selectedActivity && (

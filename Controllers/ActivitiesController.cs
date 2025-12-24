@@ -23,10 +23,10 @@ namespace StudentWebsite.Controllers
         public class ActivityRequestDto
         {
             public string StudStudentId { get; set; }
-            // For now support a single organizer; frontend can be adapted
             public int OrganizerId { get; set; }
             public string ActivityName { get; set; }
             public string Description { get; set; }
+            public DateTime ScheduledDate { get; set; }
         }
 
         [HttpPost("request")]
@@ -35,7 +35,8 @@ namespace StudentWebsite.Controllers
             if (request == null ||
                 string.IsNullOrWhiteSpace(request.StudStudentId) ||
                 string.IsNullOrWhiteSpace(request.ActivityName) ||
-                string.IsNullOrWhiteSpace(request.Description))
+                string.IsNullOrWhiteSpace(request.Description) ||
+                request.ScheduledDate == default)
             {
                 return BadRequest("Missing required fields.");
             }
@@ -62,6 +63,8 @@ namespace StudentWebsite.Controllers
                 ORG_Id = organizer.ORG_Id,
                 ACT_Name = request.ActivityName,
                 ACT_Description = request.Description,
+                ACT_ScheduledDate = request.ScheduledDate,
+                ACT_DateCreated = DateTime.UtcNow,
                 ACT_IsGranted = false
             };
 
@@ -71,18 +74,32 @@ namespace StudentWebsite.Controllers
             return CreatedAtAction(nameof(RequestActivity), new { id = activity.ACT_Id }, activity);
         }
 
-        // Simple listing endpoint for admin to see all activities
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Activity>>> GetAll()
+        public async Task<ActionResult<IEnumerable<object>>> GetAll()
         {
             var activities = await _context.Activities
                 .Include(a => a.Student)
                 .Include(a => a.Organizer)
+                .Select(a => new 
+                {
+                    a.ACT_Id,
+                    a.ACT_Name,
+                    a.ACT_Description,
+                    a.ACT_DateCreated,
+                    a.ACT_ScheduledDate,
+                    a.ACT_IsGranted,
+                    Student = a.Student != null ? new 
+                    {
+                        a.Student.STUD_StudentId,
+                        STUD_FirstName = a.Student.STUD_FName,
+                        STUD_LastName = a.Student.STUD_LName
+                    } : null,
+                    Organizer = a.Organizer != null ? a.Organizer.ORG_Organization : null
+                })
                 .ToListAsync();
 
             return Ok(activities);
         }
     }
 }
-
 

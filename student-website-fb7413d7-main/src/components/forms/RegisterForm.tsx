@@ -21,6 +21,9 @@ const courses = ["BSIT", "BSN", "BSCRIM", "BSHM", "BSMT"];
 const yearLevels = ["1", "2", "3", "4"];
 
 export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
+  const [firstName, setFirstName] = useState("");
+  const [middleInitial, setMiddleInitial] = useState("");
+  const [lastName, setLastName] = useState("");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -35,7 +38,15 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!userId.trim() || !password.trim() || !confirmPassword.trim() || !yearLevel || !course) {
+    if (
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !userId.trim() ||
+      !password.trim() ||
+      !confirmPassword.trim() ||
+      !yearLevel ||
+      !course
+    ) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -59,6 +70,9 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          firstName,
+          middleInitial,
+          lastName,
           userId,
           password,
           yearLevel: Number(yearLevel),
@@ -80,6 +94,9 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
         accUserId: data.accUserId,
         accRole: data.accRole,
         studId: data.studStudentId,
+        studFirstName: firstName,
+        studMiddleInitial: middleInitial,
+        studLastName: lastName,
         studYearLevel: data.studYearLevel,
         studCourse: data.studCourse,
       };
@@ -102,33 +119,60 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
 
   if (registrationComplete) {
     return (
-      <div className="space-y-6 text-center py-4">
-        <div className="space-y-2">
-          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-foreground">Registration Successful!</h3>
-          <p className="text-sm text-muted-foreground">Please save your Student ID below</p>
-        </div>
-        
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 space-y-2">
-          <p className="text-sm text-muted-foreground">Your Student ID</p>
-          <p className="text-2xl font-bold text-primary tracking-wider">{generatedStudentId}</p>
-          <p className="text-xs text-muted-foreground">Keep this ID safe - you'll need it for your records</p>
-        </div>
-
-        <Button onClick={handleClose} className="w-full">
-          I've Saved My ID - Close
+      <div className="space-y-4 text-center py-4">
+        <h3 className="text-lg font-semibold text-foreground">Registration successful</h3>
+        <p className="text-sm text-muted-foreground">Your Student ID:</p>
+        <p className="text-2xl font-mono font-bold text-primary tracking-wider">
+          {generatedStudentId}
+        </p>
+        <Button onClick={handleClose} className="w-full mt-2">
+          Close
         </Button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="space-y-1.5">
+        <Label htmlFor="firstName">First Name</Label>
+        <Input
+          id="firstName"
+          type="text"
+          placeholder="Enter first name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          className="h-10"
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="middleInitial">M.I.</Label>
+          <Input
+            id="middleInitial"
+            type="text"
+            maxLength={1}
+            placeholder="M"
+            value={middleInitial}
+            onChange={(e) => setMiddleInitial(e.target.value.toUpperCase())}
+            className="h-10"
+          />
+        </div>
+        <div className="space-y-1.5 col-span-2">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            id="lastName"
+            type="text"
+            placeholder="Enter last name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            className="h-10"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
         <Label htmlFor="userId">User ID</Label>
         <Input
           id="userId"
@@ -140,7 +184,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
         />
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <Label htmlFor="regPassword">Password</Label>
         <div className="relative">
           <Input
@@ -161,7 +205,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <Label htmlFor="confirmPassword">Confirm Password</Label>
         <div className="relative">
           <Input
@@ -182,7 +226,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <Label htmlFor="yearLevel">Year Level</Label>
         <Select value={yearLevel} onValueChange={setYearLevel}>
           <SelectTrigger className="h-10">
