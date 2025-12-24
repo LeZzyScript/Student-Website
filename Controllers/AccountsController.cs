@@ -42,8 +42,7 @@ namespace StudentWebsite.Controllers
             public int AccIndex { get; set; }
             public string AccUserId { get; set; }
             public string AccRole { get; set; }
-            public int StudId { get; set; }
-            public string StudStudentId { get; set; }
+            public string StudId { get; set; }  // Changed to string to match STUD_StudentId
             public int StudYearLevel { get; set; }
             public string StudCourse { get; set; }
         }
@@ -59,7 +58,7 @@ namespace StudentWebsite.Controllers
             public string Role { get; set; }
             public string AccUserId { get; set; }
             public int AccIndex { get; set; }
-            public string StudStudentId { get; set; }
+            public string StudId { get; set; }  // Changed to string to match STUD_StudentId
             public string StudFirstName { get; set; }
             public string StudMiddleInitial { get; set; }
             public string StudLastName { get; set; }
@@ -122,7 +121,10 @@ namespace StudentWebsite.Controllers
                 STUD_StudentId = studentId,
                 STUD_YearLevel = request.YearLevel,
                 STUD_Course = request.Course,
-                ACC_Index = account.ACC_Index
+                ACC_Index = account.ACC_Index,
+                Account = account,
+                Lockers = new List<Locker>(),
+                Activities = new List<Activity>()
             };
 
             _context.Students.Add(student);
@@ -133,8 +135,7 @@ namespace StudentWebsite.Controllers
                 AccIndex = account.ACC_Index,
                 AccUserId = account.ACC_UserId,
                 AccRole = account.ACC_Role,
-                StudId = student.STUD_Id,
-                StudStudentId = student.STUD_StudentId,
+                StudId = student.STUD_StudentId,  // Using STUD_StudentId as the primary key
                 StudYearLevel = student.STUD_YearLevel,
                 StudCourse = student.STUD_Course
             });
@@ -186,7 +187,8 @@ namespace StudentWebsite.Controllers
             {
                 Role = account.ACC_Role,
                 AccUserId = account.ACC_UserId,
-                AccIndex = account.ACC_Index
+                AccIndex = account.ACC_Index,
+                StudId = null // Will be set if student is found
             };
 
             if (account.ACC_Role == "student")
@@ -196,7 +198,7 @@ namespace StudentWebsite.Controllers
 
                 if (student != null)
                 {
-                    response.StudStudentId = student.STUD_StudentId;
+                    response.StudId = student.STUD_StudentId;
                     response.StudFirstName = student.STUD_FName;
                     response.StudMiddleInitial = student.STUD_MiddleI;
                     response.StudLastName = student.STUD_LName;

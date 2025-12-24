@@ -20,7 +20,7 @@ namespace StudentWebsite.Controllers
 
         public class StudentListItem
         {
-            public int StudId { get; set; }
+            public string StudId { get; set; }  // Changed to string to match STUD_StudentId
             public string StudStudentId { get; set; }
             public string FirstName { get; set; }
             public string MiddleInitial { get; set; }
@@ -37,7 +37,7 @@ namespace StudentWebsite.Controllers
                 .Include(s => s.Account)
                 .Select(s => new StudentListItem
                 {
-                    StudId = s.STUD_Id,
+                    StudId = s.STUD_StudentId,
                     StudStudentId = s.STUD_StudentId,
                     FirstName = s.STUD_FName,
                     MiddleInitial = s.STUD_MiddleI,

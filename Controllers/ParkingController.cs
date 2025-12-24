@@ -14,21 +14,21 @@ namespace StudentWebsite.Controllers
     public class ParkingController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<ParkingController> _logger;
 
-        public ParkingController(ApplicationDbContext context)
+        public ParkingController(ApplicationDbContext context, ILogger<ParkingController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public class ParkingReservationRequest
         {
-            public string StudStudentId { get; set; }
+            public string StudId { get; set; }  // Changed to string to match STUD_StudentId
             public string Spot { get; set; }
             public string VehicleType { get; set; }
             public string VehicleModel { get; set; }
             public string Schedule { get; set; } // "am" or "pm" from frontend
-            public DateTime ReservationDate { get; set; }
-            public DateTime ExpiryDate { get; set; }
         }
 
         [HttpGet("spots")]
@@ -43,8 +43,7 @@ namespace StudentWebsite.Controllers
                     pARK_VehicleType = p.PARK_VehicleType,
                     pARK_VehicleModel = p.PARK_VehicleModel,
                     pARK_Schedule = p.PARK_Schedule,
-                    pARK_ReservationDate = p.PARK_ReservationDate,
-                    pARK_ExpiryDate = p.PARK_ExpiryDate,
+                    pARK_DateCreated = p.PARK_DateCreated,
                     student = p.Student != null ? new 
                     {
                         sTUD_StudentId = p.Student.STUD_StudentId,
@@ -59,51 +58,105 @@ namespace StudentWebsite.Controllers
         }
 
         [HttpPost("reserve")]
-        public async Task<ActionResult<Parking>> Reserve([FromBody] ParkingReservationRequest request)
+    public async Task<ActionResult<Parking>> Reserve([FromBody] ParkingReservationRequest request)
+    {
+    if (request == null ||
+        string.IsNullOrWhiteSpace(request.StudId) ||
+        string.IsNullOrWhiteSpace(request.Spot) ||
+        string.IsNullOrWhiteSpace(request.VehicleType) ||
+        string.IsNullOrWhiteSpace(request.VehicleModel) ||
+        string.IsNullOrWhiteSpace(request.Schedule))
+    {
+        return BadRequest("All fields are required.");
+    }
+
+    var student = await _context.Students
+        .Include(s => s.Parking) // Include the parking relationship
+        .FirstOrDefaultAsync(s => s.STUD_StudentId == request.StudId);
+
+    if (student == null)
+    {
+        return NotFound("Student not found.");
+    }
+
+    // Check if student already has a parking spot
+    if (student.Parking != null)
+    {
+        return BadRequest("Student already has a parking reservation.");
+    }
+
+    // Check if the spot is already taken
+    var existingSpot = await _context.Parkings
+        .FirstOrDefaultAsync(p => p.PARK_Spot == request.Spot);
+    
+    if (existingSpot != null)
+    {
+        return Conflict("Parking spot is already reserved.");
+    }
+
+    var parking = new Parking
+    {
+        STUD_StudentId = student.STUD_StudentId,
+        PARK_Spot = request.Spot,
+        PARK_VehicleType = request.VehicleType,
+        PARK_VehicleModel = request.VehicleModel,
+        PARK_Schedule = request.Schedule.ToUpperInvariant(), // "AM"/"PM"
+        PARK_DateCreated = DateTime.UtcNow,
+        PARK_IsAvailable = false
+    };
+
+    _context.Parkings.Add(parking);
+    await _context.SaveChangesAsync();
+
+    return CreatedAtAction(nameof(Reserve), new { id = parking.PARK_Id }, parking);
+}
+    
+    [HttpPost("release/{studentId}")]
+    public async Task<IActionResult> ReleaseParking(string studentId)
+    {
+        var student = await _context.Students
+            .Include(s => s.Parking)
+            .FirstOrDefaultAsync(s => s.STUD_StudentId == studentId);
+
+        if (student?.Parking == null)
         {
-            if (request == null ||
-                string.IsNullOrWhiteSpace(request.StudStudentId) ||
-                string.IsNullOrWhiteSpace(request.Spot) ||
-                string.IsNullOrWhiteSpace(request.VehicleType) ||
-                string.IsNullOrWhiteSpace(request.VehicleModel) ||
-                string.IsNullOrWhiteSpace(request.Schedule))
-            {
-                return BadRequest("All fields are required.");
-            }
-
-            var student = await _context.Students
-                .FirstOrDefaultAsync(s => s.STUD_StudentId == request.StudStudentId);
-
-            if (student == null)
-            {
-                return NotFound("Student not found.");
-            }
-
-            var existing = await _context.Parkings
-                .FirstOrDefaultAsync(p => p.PARK_Spot == request.Spot);
-            if (existing != null && !existing.PARK_IsAvailable)
-            {
-                return Conflict("Parking spot is already reserved.");
-            }
-
-            var parking = new Parking
-            {
-                STUD_Id = student.STUD_Id,
-                PARK_Spot = request.Spot,
-                PARK_VehicleType = request.VehicleType,
-                PARK_VehicleModel = request.VehicleModel,
-                PARK_Schedule = request.Schedule.ToUpperInvariant(), // "AM"/"PM"
-                PARK_DateCreated = DateTime.UtcNow,
-                PARK_ReservationDate = request.ReservationDate,
-                PARK_ExpiryDate = request.ExpiryDate,
-                PARK_IsAvailable = false
-            };
-
-            _context.Parkings.Add(parking);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(Reserve), new { id = parking.PARK_Id }, parking);
+            return NotFound("No active parking reservation found for this student.");
         }
+
+        _context.Parkings.Remove(student.Parking);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    // Check if user has made parking reservation
+    [HttpGet("check-parking/{studentId}")]
+    public async Task<ActionResult<bool>> HasActiveParking(string studentId) 
+    {
+        try
+        {
+            var student = await _context.Students
+                .Include(s => s.Parking)
+                .FirstOrDefaultAsync(s => s.STUD_StudentId == studentId);
+
+            return Ok(student?.Parking != null);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error checking parking status for student {StudentId}", studentId);
+            return StatusCode(500, "An error occurred while checking parking status.");
+        }
+    }
+
+    [HttpGet("check-parking-by-student-id/{studentId}")]
+    public async Task<ActionResult<bool>> CheckParkingByStudentId(string studentId)
+    {
+        var student = await _context.Students
+            .Include(s => s.Parking)
+            .FirstOrDefaultAsync(s => s.STUD_StudentId == studentId);
+            
+        return Ok(student?.Parking != null);
+    }
     }
 }
 

@@ -82,7 +82,7 @@ export function ParkingReservationForm({ onClose, onSuccess }: ParkingReservatio
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          studStudentId: parsed.studId,
+          studId: parsed.studId || '',
           spot: formData.spot,
           vehicleType: formData.vehicleType,
           vehicleModel: formData.vehicleModel,
@@ -91,13 +91,21 @@ export function ParkingReservationForm({ onClose, onSuccess }: ParkingReservatio
       });
 
       if (!response.ok) {
-        const text = await response.text();
-        toast({
-          title: "Error",
-          description: text || "Failed to reserve parking.",
-          variant: "destructive",
-        });
-        return;
+        let errorMessage = 'Failed to reserve parking spot';
+        const responseText = await response.text();
+        
+        try {
+          // Try to parse as JSON first
+          const errorData = JSON.parse(responseText);
+          console.error('Error response:', errorData);
+          errorMessage = errorData.message || errorData.title || response.statusText || JSON.stringify(errorData);
+        } catch (e) {
+          // If not JSON, use the raw response text
+          console.error('Non-JSON error response:', responseText);
+          errorMessage = responseText || response.statusText || 'Unknown error occurred';
+        }
+        
+        throw new Error(errorMessage);
       }
 
       toast({

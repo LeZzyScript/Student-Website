@@ -71,7 +71,7 @@ export function UserManagement() {
           const sData = await studentsRes.json();
           const mappedStudents: Student[] = sData.map((s: any) => ({
             id: String(s.studId),
-            studId: s.studStudentId,
+            studId: String(s.studId),
             firstName: s.firstName,
             middleInitial: s.middleInitial ?? "",
             lastName: s.lastName,

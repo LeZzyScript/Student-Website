@@ -25,13 +25,14 @@ namespace StudentWebsite.Controllers
 
         public class ActivityRequestDto
         {
-            public string? StudStudentId { get; set; }
+            public string StudId { get; set; }  // Changed to string to match STUD_StudentId
             public int OrganizerId { get; set; }
             public string? ActivityName { get; set; }
             public string? Description { get; set; }
             public DateTime ScheduledDate { get; set; }
         }
 
+        [HttpPost("request")]
         [HttpPost("request")]
         public async Task<ActionResult<object>> RequestActivity([FromBody] ActivityRequestDto request)
         {
@@ -45,14 +46,13 @@ namespace StudentWebsite.Controllers
                     return BadRequest(new { message = "Request body cannot be null" });
                 }
 
-                // Log each property to help with debugging
-                _logger.LogInformation("StudStudentId: {StudStudentId}", request.StudStudentId);
+                _logger.LogInformation("StudId: {StudId}", request.StudId);
                 _logger.LogInformation("OrganizerId: {OrganizerId}", request.OrganizerId);
                 _logger.LogInformation("ActivityName: {ActivityName}", request.ActivityName);
                 _logger.LogInformation("Description: {Description}", request.Description);
                 _logger.LogInformation("ScheduledDate: {ScheduledDate}", request.ScheduledDate);
 
-                if (string.IsNullOrWhiteSpace(request.StudStudentId) ||
+                if (string.IsNullOrWhiteSpace(request.StudId) ||
                     string.IsNullOrWhiteSpace(request.ActivityName) ||
                     string.IsNullOrWhiteSpace(request.Description) ||
                     request.ScheduledDate == default)
@@ -62,12 +62,12 @@ namespace StudentWebsite.Controllers
                 }
 
                 var student = await _context.Students
-                    .FirstOrDefaultAsync(s => s.STUD_StudentId == request.StudStudentId);
+                    .FirstOrDefaultAsync(s => s.STUD_StudentId == request.StudId);
 
                 if (student == null)
                 {
-                    _logger.LogWarning("Student not found with ID: {StudentId}", request.StudStudentId);
-                    return NotFound(new { message = $"Student with ID {request.StudStudentId} not found." });
+                    _logger.LogWarning("Student not found with ID: {StudentId}", request.StudId);
+                    return NotFound(new { message = $"Student with ID {request.StudId} not found." });
                 }
 
                 var organizer = await _context.Organizers
@@ -81,7 +81,7 @@ namespace StudentWebsite.Controllers
 
                 var activity = new Activity
                 {
-                    STUD_Id = student.STUD_Id,
+                    STUD_StudentId = student.STUD_StudentId,
                     ORG_Id = organizer.ORG_Id,
                     ACT_Name = request.ActivityName,
                     ACT_Description = request.Description,
@@ -94,22 +94,7 @@ namespace StudentWebsite.Controllers
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation("Activity created successfully with ID: {ActivityId}", activity.ACT_Id);
-                
-                // Create initial status with default admin (ID: 1)
-                // In a production environment, you should get the current admin's ID from the authentication context
-                var defaultAdminId = 1; // Replace with actual admin ID or get from user context
-                
-                var status = new ActivityStatus
-                {
-                    ACT_Id = activity.ACT_Id,
-                    ACC_Index = defaultAdminId,
-                    ACT_IsGranted = false, // Default to false (pending)
-                    ACT_Notify = "Activity request submitted and pending approval"
-                };
-                
-                _context.ActivityStatuses.Add(status);
-                await _context.SaveChangesAsync();
-                
+
                 return Ok(new 
                 {
                     message = "Activity request submitted successfully!",
@@ -121,9 +106,18 @@ namespace StudentWebsite.Controllers
                         activity.ACT_DateCreated,
                         activity.ACT_ScheduledDate,
                         activity.ACT_IsGranted,
-                        Student = new { student.STUD_StudentId, STUD_FirstName = student.STUD_FName, STUD_LastName = student.STUD_LName },
-                        Organizer = new { organizer.ORG_Organization, organizer.ORG_FName, organizer.ORG_LName },
-                        Status = "Pending"
+                        Student = new { 
+                            student.STUD_StudentId, 
+                            STUD_FirstName = student.STUD_FName, 
+                            STUD_LastName = student.STUD_LName 
+                        },
+                        Organizer = new { 
+                            organizer.ORG_Id, 
+                            organizer.ORG_Organization, 
+                            organizer.ORG_FName, 
+                            organizer.ORG_LName 
+                        },
+                        Status = activity.ACT_IsGranted ? "Approved" : "Pending"
                     }
                 });
             }

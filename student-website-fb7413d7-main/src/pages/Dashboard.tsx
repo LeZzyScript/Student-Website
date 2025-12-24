@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import {
   ChevronDown, 
   LogOut,
   Plus,
-  Eye,
   User
 } from "lucide-react";
 import {
@@ -33,77 +32,138 @@ import { LockerReservationForm } from "@/components/forms/LockerReservationForm"
 import { toast } from "@/hooks/use-toast";
 
 type DialogType = "parking" | "activity" | "locker" | null;
+type ParkingStatus = 'loading' | 'hasParking' | 'noParking' | 'error';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [hasParking, setHasParking] = useState(false);
+  const [parkingStatus, setParkingStatus] = useState<ParkingStatus>('loading');
   const [openDialog, setOpenDialog] = useState<DialogType>(null);
   const [studentName, setStudentName] = useState("Student Dashboard");
   const [studentInitials, setStudentInitials] = useState("ST");
+  const [studentId, setStudentId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("registeredUser");
-    if (!stored) return;
+  // Check parking status for a student
+  const checkParkingStatus = useCallback(async (id: string): Promise<void> => {
+    console.log(`[Parking Debug] Checking parking status for student ID: ${id}`);
+    setParkingStatus('loading');
+    
     try {
+      const response = await fetch(
+        `http://localhost:5256/api/parking/check-parking-by-student-id/${id}`
+      );
+      
+      console.log('[Parking Debug] Parking status response:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const hasActiveParking = await response.json();
+      setParkingStatus(hasActiveParking ? 'hasParking' : 'noParking');
+      
+    } catch (error) {
+      console.error('[Parking Debug] Error checking parking status:', error);
+      setParkingStatus('error');
+    }
+  }, []);
+
+  // Fetch user data and parking status
+  useEffect(() => {
+    console.log('[Dashboard] Initializing dashboard...');
+    const stored = localStorage.getItem("registeredUser");
+    
+    if (!stored) {
+      console.warn('[Dashboard] No registered user found in localStorage');
+      setParkingStatus('error');
+      return;
+    }
+
+    try {
+      console.log('[Dashboard] Parsing user data from localStorage');
       const parsed = JSON.parse(stored) as {
         studFirstName?: string;
         studMiddleInitial?: string;
         studLastName?: string;
+        studId?: string;
       };
+
+      console.log('[Dashboard] Parsed user data:', parsed);
+
+      // Set user info
       const first = parsed.studFirstName?.trim() ?? "";
       const middle = parsed.studMiddleInitial?.trim() ?? "";
       const last = parsed.studLastName?.trim() ?? "";
 
-      const fullName = [first, middle && `${middle}.`, last].filter(Boolean).join(" ");
-      if (fullName) {
+      if (first || last) {
+        const fullName = [first, middle && `${middle}.`, last].filter(Boolean).join(" ");
+        const initials = (first ? first[0].toUpperCase() : "") + (last ? last[0].toUpperCase() : "");
+        
+        console.log(`[Dashboard] Setting user name to: ${fullName}, initials: ${initials}`);
         setStudentName(fullName);
-      }
-
-      const initials =
-        (first ? first[0].toUpperCase() : "") +
-        (last ? last[0].toUpperCase() : "");
-      if (initials) {
         setStudentInitials(initials);
       }
-    } catch {
-      // ignore parse errors
+
+      // Set student ID if available
+      if (parsed.studId) {
+        console.log(`[Dashboard] Found student ID: ${parsed.studId}`);
+        setStudentId(parsed.studId);
+        checkParkingStatus(parsed.studId).catch(error => {
+          console.error('[Dashboard] Error in checkParkingStatus:', error);
+        });
+      } else {
+        console.warn('[Dashboard] No student ID found in user data');
+        setParkingStatus('error');
+      }
+    } catch (error) {
+      console.error('[Dashboard] Error initializing dashboard:', error);
+      setParkingStatus('error');
     }
-  }, []);
+  }, [checkParkingStatus]);
 
   const handleLogout = () => {
+    localStorage.removeItem("registeredUser");
     navigate("/");
   };
 
   const closeDialog = () => setOpenDialog(null);
 
-  const handleLockerClick = () => {
-    if (hasParking) {
+  const handleLockerClick = async () => {
+    if (!studentId) {
+      toast({
+        title: "Error",
+        description: "Student information not found. Please log in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Re-check parking status right before opening the locker dialog
+    await checkParkingStatus(studentId);
+
+    if (parkingStatus === 'hasParking') {
       setOpenDialog("locker");
     } else {
       toast({
         title: "Parking Reservation Required",
-        description: "You need to create a parking reservation first before you can reserve a locker.",
+        description: "You need an active parking reservation to access lockers.",
         variant: "destructive",
       });
     }
   };
 
-  const handleViewLockerClick = () => {
-    if (hasParking) {
-      console.log("View locker reservations");
-      // TODO: Implement view locker reservations
-    } else {
-      toast({
-        title: "Parking Reservation Required",
-        description: "You need to create a parking reservation first before you can view locker reservations.",
-        variant: "destructive",
-      });
-    }
+  const handleParkingSuccess = async () => {
+    await refreshParkingStatus();
   };
 
-  const handleParkingSuccess = () => {
-    setHasParking(true);
-  };
+  const refreshParkingStatus = useCallback(async () => {
+    if (studentId) {
+      await checkParkingStatus(studentId);
+    }
+  }, [studentId, checkParkingStatus]);
 
   const menuItems = [
     {
@@ -111,8 +171,11 @@ const Dashboard = () => {
       description: "Reserve your parking spot on campus",
       icon: Car,
       actions: [
-        { label: "Create Reservation", icon: Plus, onClick: () => setOpenDialog("parking") },
-        { label: "View Reservations", icon: Eye, onClick: () => console.log("View parking") },
+        { 
+          label: "Create Reservation", 
+          icon: Plus, 
+          onClick: () => setOpenDialog("parking") 
+        }
       ],
     },
     {
@@ -120,20 +183,29 @@ const Dashboard = () => {
       description: "Submit requests for campus activities and events",
       icon: CalendarPlus,
       actions: [
-        { label: "Create Request", icon: Plus, onClick: () => setOpenDialog("activity") },
+        { 
+          label: "Create Request", 
+          icon: Plus, 
+          onClick: () => setOpenDialog("activity") 
+        },
       ],
     },
     {
       title: "Locker Reservation",
-      description: hasParking 
-        ? "Reserve a locker for your belongings" 
-        : "Requires parking reservation first",
+      description: parkingStatus === 'loading' 
+        ? "Checking parking status..." 
+        : parkingStatus === 'hasParking' 
+          ? "Reserve a locker for your belongings" 
+          : "Requires active parking reservation",
       icon: Lock,
       actions: [
-        { label: "Create Reservation", icon: Plus, onClick: handleLockerClick },
-        { label: "View Reservations", icon: Eye, onClick: handleViewLockerClick },
+        { 
+          label: "Create Reservation", 
+          icon: Plus, 
+          onClick: handleLockerClick,
+          disabled: parkingStatus === 'loading' || parkingStatus === 'noParking'
+        }
       ],
-      requiresParking: true,
     },
   ];
 
@@ -152,7 +224,6 @@ const Dashboard = () => {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Notifications */}
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5 text-muted-foreground" />
               <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-accent text-[10px] font-medium text-accent-foreground flex items-center justify-center">
@@ -160,7 +231,6 @@ const Dashboard = () => {
               </span>
             </Button>
 
-            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-2 md:px-3">
@@ -181,7 +251,10 @@ const Dashboard = () => {
                   {studentName}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+                <DropdownMenuItem 
+                  onClick={handleLogout} 
+                  className="text-destructive focus:text-destructive"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
@@ -227,6 +300,7 @@ const Dashboard = () => {
                       size="sm"
                       onClick={action.onClick}
                       className="flex items-center gap-1.5"
+                      disabled={action.disabled}
                     >
                       <action.icon className="h-4 w-4" />
                       {action.label}
@@ -247,7 +321,10 @@ const Dashboard = () => {
                 Fill out the form to reserve your parking spot.
               </DialogDescription>
             </DialogHeader>
-            <ParkingReservationForm onClose={closeDialog} onSuccess={handleParkingSuccess} />
+            <ParkingReservationForm 
+              onClose={closeDialog} 
+              onSuccess={handleParkingSuccess} 
+            />
           </DialogContent>
         </Dialog>
 

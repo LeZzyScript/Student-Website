@@ -6,11 +6,6 @@ namespace StudentWebsite.Models
 {
     public class Activity
     {
-        public Activity()
-        {
-            ActivityStatuses = new HashSet<ActivityStatus>();
-        }
-        
         [Key]
         public int ACT_Id { get; set; }
         
@@ -31,15 +26,12 @@ namespace StudentWebsite.Models
         public bool ACT_IsGranted { get; set; }
         
         // Foreign keys
-        public int? STUD_Id { get; set; }
-        public int ORG_Id { get; set; }
-        
-        // Navigation properties
-        [ForeignKey("STUD_Id")]
+        public string STUD_StudentId { get; set; }
+        [ForeignKey("STUD_StudentId")]
         public virtual Student Student { get; set; }
         
+        public int ORG_Id { get; set; }
         [ForeignKey("ORG_Id")]
         public virtual Organizer Organizer { get; set; }
-        public virtual ICollection<ActivityStatus> ActivityStatuses { get; set; }
     }
 }

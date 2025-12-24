@@ -33,7 +33,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [registrationComplete, setRegistrationComplete] = useState(false);
-  const [generatedStudentId, setGeneratedStudentId] = useState("");
+  const [generatedStudentId, setGeneratedStudentId] = useState("");  // Already a string
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,7 +116,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
           accIndex: data.accIndex,
           accUserId: data.accUserId,
           accRole: data.accRole,
-          studId: data.studStudentId,
+          studId: String(data.studId),
           studFirstName: firstName,
           studMiddleInitial: middleInitial,
           studLastName: lastName,
@@ -126,7 +126,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
           ...loginData
         };
         localStorage.setItem("registeredUser", JSON.stringify(userData));
-        setGeneratedStudentId(data.studStudentId);
+        setGeneratedStudentId(String(data.studId));
         setRegistrationComplete(true);
         onSuccess?.();
       } catch (loginError) {
@@ -135,7 +135,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
           accIndex: data.accIndex,
           accUserId: data.accUserId,
           accRole: data.accRole,
-          studId: data.studStudentId,
+          studId: String(data.studId),
           studFirstName: firstName,
           studMiddleInitial: middleInitial,
           studLastName: lastName,
@@ -143,7 +143,7 @@ export const RegisterForm = ({ onClose, onSuccess }: RegisterFormProps) => {
           studCourse: data.studCourse,
         };
         localStorage.setItem("registeredUser", JSON.stringify(userData));
-        setGeneratedStudentId(data.studStudentId);
+        setGeneratedStudentId(String(data.studId));
         setRegistrationComplete(true);
         onSuccess?.();
       }

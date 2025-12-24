@@ -12,8 +12,8 @@ using StudentWebsite.Data;
 namespace StudentWebsite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251224030830_InitialMigrations")]
-    partial class InitialMigrations
+    [Migration("20251224113611_UpdateParkingToOneToOne")]
+    partial class UpdateParkingToOneToOne
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,47 +82,17 @@ namespace StudentWebsite.Migrations
                     b.Property<int>("ORG_Id")
                         .HasColumnType("int");
 
-                    b.Property<int?>("STUD_Id")
-                        .HasColumnType("int");
+                    b.Property<string>("STUD_StudentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("ACT_Id");
 
                     b.HasIndex("ORG_Id");
 
-                    b.HasIndex("STUD_Id");
+                    b.HasIndex("STUD_StudentId");
 
                     b.ToTable("Activities");
-                });
-
-            modelBuilder.Entity("StudentWebsite.Models.ActivityStatus", b =>
-                {
-                    b.Property<int>("ACT_StatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ACT_StatusId"));
-
-                    b.Property<int>("ACC_Index")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ACT_Id")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("ACT_IsGranted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ACT_Notify")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("ACT_StatusId");
-
-                    b.HasIndex("ACC_Index");
-
-                    b.HasIndex("ACT_Id");
-
-                    b.ToTable("ActivityStatuses");
                 });
 
             modelBuilder.Entity("StudentWebsite.Models.Locker", b =>
@@ -143,43 +113,15 @@ namespace StudentWebsite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("STUD_Id")
-                        .HasColumnType("int");
+                    b.Property<string>("STUD_StudentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("LOCK_Id");
 
-                    b.HasIndex("STUD_Id");
+                    b.HasIndex("STUD_StudentId");
 
                     b.ToTable("Lockers");
-                });
-
-            modelBuilder.Entity("StudentWebsite.Models.LockerStatus", b =>
-                {
-                    b.Property<int>("LOCKSTATUS_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LOCKSTATUS_Id"));
-
-                    b.Property<int>("LOCK_Id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StatusDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("LOCKSTATUS_Id");
-
-                    b.HasIndex("LOCK_Id");
-
-                    b.ToTable("LockerStatuses");
                 });
 
             modelBuilder.Entity("StudentWebsite.Models.Organizer", b =>
@@ -225,14 +167,8 @@ namespace StudentWebsite.Migrations
                     b.Property<DateTime>("PARK_DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("PARK_ExpiryDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("PARK_IsAvailable")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime>("PARK_ReservationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("PARK_Schedule")
                         .IsRequired()
@@ -254,54 +190,23 @@ namespace StudentWebsite.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<int>("STUD_Id")
-                        .HasColumnType("int");
+                    b.Property<string>("STUD_StudentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("PARK_Id");
 
-                    b.HasIndex("STUD_Id");
+                    b.HasIndex("STUD_StudentId")
+                        .IsUnique();
 
                     b.ToTable("Parkings");
                 });
 
-            modelBuilder.Entity("StudentWebsite.Models.ParkingStatus", b =>
-                {
-                    b.Property<int>("PARK_StatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PARK_StatusId"));
-
-                    b.Property<int>("ACC_Index")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PARK_Id")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("PARK_IsAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PARK_Notify")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("PARK_StatusId");
-
-                    b.HasIndex("ACC_Index");
-
-                    b.HasIndex("PARK_Id");
-
-                    b.ToTable("ParkingStatuses");
-                });
-
             modelBuilder.Entity("StudentWebsite.Models.Student", b =>
                 {
-                    b.Property<int>("STUD_Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("STUD_Id"));
+                    b.Property<string>("STUD_StudentId")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("ACC_Index")
                         .HasColumnType("int");
@@ -325,18 +230,12 @@ namespace StudentWebsite.Migrations
                         .HasMaxLength(1)
                         .HasColumnType("nvarchar(1)");
 
-                    b.Property<string>("STUD_StudentId")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<int>("STUD_YearLevel")
                         .HasColumnType("int");
 
-                    b.HasKey("STUD_Id");
+                    b.HasKey("STUD_StudentId");
 
-                    b.HasIndex("ACC_Index")
-                        .IsUnique();
+                    b.HasIndex("ACC_Index");
 
                     b.ToTable("Students");
                 });
@@ -350,107 +249,61 @@ namespace StudentWebsite.Migrations
                         .IsRequired();
 
                     b.HasOne("StudentWebsite.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("STUD_Id");
+                        .WithMany("Activities")
+                        .HasForeignKey("STUD_StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Organizer");
 
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("StudentWebsite.Models.ActivityStatus", b =>
-                {
-                    b.HasOne("StudentWebsite.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("ACC_Index")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("StudentWebsite.Models.Activity", "Activity")
-                        .WithMany("ActivityStatuses")
-                        .HasForeignKey("ACT_Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-
-                    b.Navigation("Activity");
-                });
-
             modelBuilder.Entity("StudentWebsite.Models.Locker", b =>
                 {
                     b.HasOne("StudentWebsite.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("STUD_Id");
-
-                    b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("StudentWebsite.Models.LockerStatus", b =>
-                {
-                    b.HasOne("StudentWebsite.Models.Locker", "Locker")
-                        .WithMany("LockerStatuses")
-                        .HasForeignKey("LOCK_Id")
+                        .WithMany("Lockers")
+                        .HasForeignKey("STUD_StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Locker");
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("StudentWebsite.Models.Parking", b =>
                 {
                     b.HasOne("StudentWebsite.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("STUD_Id")
+                        .WithOne("Parking")
+                        .HasForeignKey("StudentWebsite.Models.Parking", "STUD_StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("StudentWebsite.Models.ParkingStatus", b =>
+            modelBuilder.Entity("StudentWebsite.Models.Student", b =>
                 {
                     b.HasOne("StudentWebsite.Models.Account", "Account")
                         .WithMany()
                         .HasForeignKey("ACC_Index")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("StudentWebsite.Models.Parking", "Parking")
-                        .WithMany()
-                        .HasForeignKey("PARK_Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-
-                    b.Navigation("Parking");
-                });
-
-            modelBuilder.Entity("StudentWebsite.Models.Student", b =>
-                {
-                    b.HasOne("StudentWebsite.Models.Account", "Account")
-                        .WithOne()
-                        .HasForeignKey("StudentWebsite.Models.Student", "ACC_Index")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("StudentWebsite.Models.Activity", b =>
-                {
-                    b.Navigation("ActivityStatuses");
-                });
-
-            modelBuilder.Entity("StudentWebsite.Models.Locker", b =>
-                {
-                    b.Navigation("LockerStatuses");
-                });
-
             modelBuilder.Entity("StudentWebsite.Models.Organizer", b =>
                 {
                     b.Navigation("Activities");
+                });
+
+            modelBuilder.Entity("StudentWebsite.Models.Student", b =>
+                {
+                    b.Navigation("Activities");
+
+                    b.Navigation("Lockers");
+
+                    b.Navigation("Parking");
                 });
 #pragma warning restore 612, 618
         }

@@ -76,7 +76,7 @@ export function ActivityRequestForm({ onClose }: { onClose: () => void }) {
       return;
     }
 
-    const parsed = JSON.parse(stored) as { studId?: string };
+    const parsed = JSON.parse(stored) as { studId?: number };
     if (!parsed.studId) {
       toast({
         title: "Error",
@@ -95,7 +95,7 @@ export function ActivityRequestForm({ onClose }: { onClose: () => void }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            StudStudentId: parsed.studId,
+            studId: parsed.studId,
             OrganizerId: Number(firstOrganizerId),
             ActivityName: formData.activityName,
             Description: formData.description,

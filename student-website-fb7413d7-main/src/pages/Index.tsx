@@ -95,7 +95,7 @@ const Index = () => {
         accIndex: data.accIndex,
         accUserId: data.accUserId,
         accRole: data.role,
-        studId: data.studStudentId,
+        studId: data.studId,
         studFirstName: data.studFirstName,
         studMiddleInitial: data.studMiddleInitial,
         studLastName: data.studLastName,
