@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StudentWebsite.Data;
@@ -12,6 +13,7 @@ namespace StudentWebsite.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("AllowFrontend")]
     public class ActivitiesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -32,7 +34,6 @@ namespace StudentWebsite.Controllers
             public DateTime ScheduledDate { get; set; }
         }
 
-        [HttpPost("request")]
         [HttpPost("request")]
         public async Task<ActionResult<object>> RequestActivity([FromBody] ActivityRequestDto request)
         {

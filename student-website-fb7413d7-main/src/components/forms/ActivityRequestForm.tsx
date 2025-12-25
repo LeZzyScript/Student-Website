@@ -90,16 +90,24 @@ export function ActivityRequestForm({ onClose }: { onClose: () => void }) {
 
     (async () => {
       try {
-        const scheduledDate = new Date(formData.scheduledDate).toISOString();
+        // Ensure the date is properly formatted for the backend
+        const scheduledDate = new Date(formData.scheduledDate);
+        if (isNaN(scheduledDate.getTime())) {
+          throw new Error("Invalid date format");
+        }
+        
         const response = await fetch("http://localhost:5256/api/activities/request", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
           body: JSON.stringify({
             studId: parsed.studId,
-            OrganizerId: Number(firstOrganizerId),
-            ActivityName: formData.activityName,
-            Description: formData.description,
-            ScheduledDate: scheduledDate,
+            organizerId: Number(firstOrganizerId),  // Changed to match DTO property name
+            activityName: formData.activityName,
+            description: formData.description,
+            scheduledDate: scheduledDate.toISOString(),
           }),
         });
 

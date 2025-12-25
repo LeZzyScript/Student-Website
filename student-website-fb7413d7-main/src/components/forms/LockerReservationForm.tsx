@@ -123,7 +123,7 @@ export function LockerReservationForm({ onClose }: LockerReservationFormProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          StudStudentId: studentId,
+          StudId: studentId,
           Spot: formData.spot.trim().toUpperCase(),
         }),
       });
