@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\studentwebsite.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:studentwebsite.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\studentwebsite.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:studentwebsite.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\wwwroot\\css\\index.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
@@ -86,11 +86,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "StudentWebsite.csproj",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
               "RelativeDocumentMoniker": "StudentWebsite.csproj",
@@ -127,7 +127,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -135,11 +135,12 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAE8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-03T06:52:28.535Z"
+              "WhenOpened": "2025-12-03T06:52:28.535Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -147,7 +148,8 @@
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-12-03T06:48:24.013Z"
+              "WhenOpened": "2025-12-03T06:48:24.013Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",

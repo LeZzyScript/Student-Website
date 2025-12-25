@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "+OnDSf7gaYM=",
+  "dgSpecHash": "5psxBigqjdo=",
   "success": true,
   "projectFilePath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
   "expectedPackageFiles": [
@@ -67,14 +67,20 @@
     {
       "code": "NU1510",
       "level": "Warning",
+      "message": "PackageReference Microsoft.AspNetCore.Identity will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
+      "targetGraphs": []
+    },
+    {
+      "code": "NU1510",
+      "level": "Warning",
       "message": "PackageReference Microsoft.AspNetCore.Authentication.Cookies will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
       "projectPath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
       "warningLevel": 1,
       "filePath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
-      "libraryId": "Microsoft.AspNetCore.Authentication.Cookies",
-      "targetGraphs": [
-        "net10.0"
-      ]
+      "targetGraphs": []
     },
     {
       "code": "NU1510",
@@ -83,22 +89,7 @@
       "projectPath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
       "warningLevel": 1,
       "filePath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
-      "libraryId": "Microsoft.AspNetCore.Cors",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    },
-    {
-      "code": "NU1510",
-      "level": "Warning",
-      "message": "PackageReference Microsoft.AspNetCore.Identity will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "projectPath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
-      "libraryId": "Microsoft.AspNetCore.Identity",
-      "targetGraphs": [
-        "net10.0"
-      ]
+      "targetGraphs": []
     }
   ]
 }

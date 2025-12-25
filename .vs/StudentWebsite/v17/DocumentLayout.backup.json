@@ -94,9 +94,9 @@
               "Title": "StudentWebsite.csproj",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
               "RelativeDocumentMoniker": "StudentWebsite.csproj",
-              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj*",
-              "RelativeToolTip": "StudentWebsite.csproj*",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA4AAABTAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
+              "RelativeToolTip": "StudentWebsite.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2025-12-25T01:11:36.394Z",
               "EditorCaption": ""
@@ -147,8 +147,7 @@
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-12-03T06:48:24.013Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-03T06:48:24.013Z"
             },
             {
               "$type": "Document",
