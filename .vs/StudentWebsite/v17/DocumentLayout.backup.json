@@ -3,20 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\studentwebsite.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:studentwebsite.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\models\\activitystatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:models\\activitystatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\models\\account.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:models\\account.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\wwwroot\\css\\index.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
       "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:wwwroot\\css\\index.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\models\\account.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:models\\account.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\wwwroot\\css\\app.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
@@ -25,14 +33,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\models\\parkingstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:models\\parkingstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\models\\lockerstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:models\\lockerstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\models\\activity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -59,20 +59,24 @@
       "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|c:\\users\\kythc\\desktop\\kyth code\\eldnet\\studentwebsite\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A4729A7C-4775-4867-B83F-394754AE0BEC}|StudentWebsite.csproj|solutionrelative:controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\ActivityStatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Models\\ActivityStatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\ParkingStatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Models\\ParkingStatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\LockerStatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Models\\LockerStatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -82,8 +86,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "StudentWebsite.csproj",
+              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj",
+              "RelativeDocumentMoniker": "StudentWebsite.csproj",
+              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\StudentWebsite.csproj*",
+              "RelativeToolTip": "StudentWebsite.csproj*",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA4AAABTAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-12-25T01:11:36.394Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 3,
@@ -92,33 +109,9 @@
               "RelativeDocumentMoniker": "wwwroot\\css\\index.css",
               "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\wwwroot\\css\\index.css",
               "RelativeToolTip": "wwwroot\\css\\index.css",
-              "ViewState": "AgIAAFoAAAAAAAAAAAAAAFMAAAAmAAAAAAAAAA==",
+              "ViewState": "AgIAAFcAAAAAAAAAAAAAAFMAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
               "WhenOpened": "2025-12-14T13:53:04.338Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAyAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-12-14T13:50:01.998Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Student.cs",
-              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\Student.cs",
-              "RelativeDocumentMoniker": "Models\\Student.cs",
-              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\Student.cs",
-              "RelativeToolTip": "Models\\Student.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-03T07:34:25.935Z"
             },
             {
               "$type": "Document",
@@ -134,7 +127,56 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAE8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-03T06:52:28.535Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-12-03T06:48:24.013Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Student.cs",
+              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\Student.cs",
+              "RelativeDocumentMoniker": "Models\\Student.cs",
+              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\Student.cs",
+              "RelativeToolTip": "Models\\Student.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-03T07:34:25.935Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-14T13:50:01.998Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
               "Title": "ActivityStatus.cs",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\ActivityStatus.cs",
               "RelativeDocumentMoniker": "Models\\ActivityStatus.cs",
@@ -146,20 +188,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "ApplicationDbContext.cs",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Data\\ApplicationDbContext.cs",
               "RelativeDocumentMoniker": "Data\\ApplicationDbContext.cs",
               "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Data\\ApplicationDbContext.cs",
               "RelativeToolTip": "Data\\ApplicationDbContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD0AAAArAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-03T07:48:44.236Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-03T07:48:44.236Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "Account.cs",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\Account.cs",
               "RelativeDocumentMoniker": "Models\\Account.cs",
@@ -171,7 +212,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "app.css",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\wwwroot\\css\\app.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\app.css",
@@ -183,7 +224,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 17,
               "Title": "ParkingStatus.cs",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\ParkingStatus.cs",
               "RelativeDocumentMoniker": "Models\\ParkingStatus.cs",
@@ -195,7 +236,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 18,
               "Title": "LockerStatus.cs",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Models\\LockerStatus.cs",
               "RelativeDocumentMoniker": "Models\\LockerStatus.cs",
@@ -231,7 +272,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 14,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "Views\\Home\\Index.cshtml",
@@ -267,31 +308,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\appsettings.json",
-              "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-12-03T06:48:24.013Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 15,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-03T06:52:28.535Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
               "Title": "HomeController.cs",
               "DocumentMoniker": "C:\\Users\\kythc\\Desktop\\Kyth Code\\ELDNET\\StudentWebsite\\Controllers\\HomeController.cs",
               "RelativeDocumentMoniker": "Controllers\\HomeController.cs",
